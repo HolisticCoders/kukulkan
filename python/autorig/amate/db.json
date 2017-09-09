@@ -1,0 +1,20 @@
+{
+    "graph": {}, 
+    "node": {
+        "control": {
+            "children": {
+                "shape": "Attribute", 
+                "xform": "Attribute"
+            }
+        }, 
+        "transform": {
+            "children": {
+                "xform": "Attribute"
+            }
+        }
+    }, 
+    "attribute": {
+        "transform": {}, 
+        "shape": {}
+    }
+}
