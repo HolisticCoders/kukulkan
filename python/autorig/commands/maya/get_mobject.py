@@ -1,5 +1,6 @@
 import maya.api.OpenMaya as om
 
+
 def run(name, *args, **kwargs):
     """Get an MObject from the specified name.
 
