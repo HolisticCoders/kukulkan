@@ -25,6 +25,12 @@ def test_database():
     print 'Database data:', graph.db_data()
 
 
+def test_create_graph():
+    graph = autorig.amate.api.Graph()
+    print graph.add_child('myControl', 'control')
+
+
 if __name__ == '__main__':
-    test_amate_types()
-    test_database()
+    # test_amate_types()
+    # test_database()
+    test_create_graph()

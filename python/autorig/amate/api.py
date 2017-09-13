@@ -73,7 +73,7 @@ class AmateObject(MutableMapping):
         children = data['children']
         serializable = {}
         for name, child in children.iteritems():
-            serializable[name] = child.__class__.__name__
+            serializable[name] = child.exact_type
         data['children'] = serializable
         return data
 
@@ -117,10 +117,11 @@ class AmateObject(MutableMapping):
 
         :param str name: Name of the object class to load.
         """
-        data = self.db_data()[self.amate_type][name]
+        data = self.db_data()[self.amate_type].get(name, {})
         for name, type in data.pop('children', {}).iteritems():
             self.add_child(name, type)
         self.data = data
+        self.exact_type = name
 
     def children(self):
         """Return the children of this object.
@@ -129,14 +130,14 @@ class AmateObject(MutableMapping):
         """
         return self.data['children']
 
-    def add_child(self, name, type):
+    def add_child(self, name, child_type):
         """Add a child to this object.
 
         :param str name: Name of the created child.
-        :param str type: Type of child you want to add.
+        :param str child_type: type of child you want to add.
 
         :return: The created child.
-        :rtype: AmateObject
+        :rchild_type: AmateObject
         """
         if name in self:
             msg = '{} already has a child named {}.'
@@ -146,7 +147,7 @@ class AmateObject(MutableMapping):
             raise AttributeError(parent_class + ' cannot have children.')
         child_class = globals()[child_types[parent_class]]
         child = child_class()
-        child.load(type)
+        child.load(child_type)
         self.data['children'][name] = child
         return child
 
