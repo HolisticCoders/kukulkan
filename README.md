@@ -1,2 +1,2 @@
 # Kukulkan
-Kukulkan is a maya autorig written in python.
+Kukulkan is a fully nodal autorig written in python.
