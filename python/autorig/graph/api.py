@@ -75,25 +75,42 @@ class Graph(Unique):
 
 
 class Node(Unique):
-    """A `Node` containing `Attribute` items.
-    """
+    """A `Node` containing `Attribute` items."""
 
-    attributes = {}
+    builtin_attributes = {}
 
     def __init__(self, name):
         super(Node, self).__init__()
-        self._generate_attributes()
+        self.attributes = {}
+        self.attribute_names = {}
         self.name = name
+        self._generate_builtin_attributes()
 
     def __str__(self):
         return str(self.name)
 
-    def _generate_attributes(self):
-        """Generate built-in attributes of this `Node`.
+    def _generate_builtin_attributes(self):
+        """Generate built-in attributes of this `Node`."""
+        attrs = self.builtin_attributes.iteritems()
+        for name, attribute_class in attrs:
+            self.add_attribute(name, attribute_class)
+
+    def add_attribute(self, name, attribute_class):
+        """Add an attribute on this node.
+
+        The attribute will be accessible as a regular Python
+        attribute, with dot notation.
+
+        :param str name: Name of the attribute to add.
+        :param attribute_class: Class of the attribute to add.
         """
-        for name, attribute_class in self.attributes.iteritems():
-            attribute = attribute_class(name, self)
-            setattr(self, name, attribute)
+        if name in self.attribute_names:
+            err = 'Attribute {} already exists.'.format(name)
+            raise KeyError(err)
+        attribute = attribute_class(name, self)
+        setattr(self, name, attribute)
+        self.attributes[attribute.uuid] = attribute
+        self.attribute_names[name] = attribute
 
     def run(self):
         """Method executed when the state of the graph changes.

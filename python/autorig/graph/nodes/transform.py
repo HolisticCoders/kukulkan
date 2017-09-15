@@ -5,7 +5,7 @@ from autorig.graph.attributes.matrix import XForm
 class Transform(Node):
     """A transformation node."""
 
-    attributes = {
+    builtin_attributes = {
         'xform': XForm,
     }
 
