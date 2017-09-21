@@ -18,7 +18,8 @@ def main():
     app = _qt.QApplication(sys.argv)
 
     window = autorig.gui.jong.window.GraphWindow()
-    window.scene.add_node('jong')
+    node = window.scene.add_node('jong')
+    node.add_attribute('myAttr')
     window.show()
 
     sys.exit(app.exec_())
