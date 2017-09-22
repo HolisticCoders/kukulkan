@@ -79,6 +79,3 @@ class Attribute(_qt.QGraphicsItem):
     #     :param destination: Destination attribute.
     #     :type destination: Attribute.
     #     """
-
-    def mousePressEvent(self):
-        """Create a `Connection` object from this attribute."""
