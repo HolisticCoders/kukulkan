@@ -1,5 +1,5 @@
 import autorig.gui.qt.QtGui as _qt
-import autorig.gui.jong.graph as _graph
+import autorig.gui.api.graph as _graph
 
 
 class GraphWindow(_qt.QMainWindow):

@@ -1,6 +1,6 @@
 import autorig.gui.qt.QtGui as _qt
 import autorig.gui.qt.QtCore as _qtcore
-import autorig.gui.jong.attribute as _attr
+import autorig.gui.api.attribute as _attr
 
 
 class Node(_qt.QGraphicsItem):
@@ -101,3 +101,9 @@ class Node(_qt.QGraphicsItem):
             _qtcore.Qt.AlignVCenter | _qtcore.Qt.AlignLeft,
             self.name,
         )
+
+    def mouseMoveEvent(self, event):
+        super(Node, self).mouseMoveEvent(event)
+        for attribute in self.attributes.values():
+            for connection in attribute.connections.values():
+                connection.update_path(event)

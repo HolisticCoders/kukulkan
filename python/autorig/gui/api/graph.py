@@ -1,6 +1,6 @@
 import autorig.gui.qt.QtGui as _qt
 
-import autorig.gui.jong.node as _node
+import autorig.gui.api.node as _node
 
 
 class Graph(_qt.QGraphicsScene):

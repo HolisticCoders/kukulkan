@@ -10,16 +10,17 @@ sys.path.append(py_kukulkan)
 
 
 import autorig.gui.qt.QtGui as _qt
-import autorig.gui.jong.window
-import autorig.gui.jong.node
+import autorig.gui.api.window
 
 
 def main():
     app = _qt.QApplication(sys.argv)
 
-    window = autorig.gui.jong.window.GraphWindow()
-    node = window.scene.add_node('jong')
-    node.add_attribute('myAttr')
+    window = autorig.gui.api.window.GraphWindow()
+    jong = window.scene.add_node('jong')
+    jonhy = window.scene.add_node('johny')
+    jong.add_attribute('rouleau_de_printemps')
+    jonhy.add_attribute('autre_chose')
     window.show()
 
     sys.exit(app.exec_())
