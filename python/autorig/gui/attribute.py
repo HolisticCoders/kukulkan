@@ -69,3 +69,16 @@ class Attribute(_qt.QGraphicsItem):
             _qtcore.Qt.AlignCenter,
             self.name,
         )
+
+    # def connect(self, destination):
+    #     """Connect this `Attribute` to another one.
+    #
+    #     This `Attribute` will be the source, and the ``destination`` will be
+    #     the driven `Attribute`.
+    #
+    #     :param destination: Destination attribute.
+    #     :type destination: Attribute.
+    #     """
+
+    def mousePressEvent(self):
+        """Create a `Connection` object from this attribute."""
