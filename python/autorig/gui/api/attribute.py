@@ -8,6 +8,7 @@ class Attribute(_qt.QGraphicsItem):
         super(Attribute, self).__init__(node)
         self.name = name
         self.node = node
+        self.value = None
         self.connections = {}
         self.reset()
 
