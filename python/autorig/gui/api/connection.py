@@ -8,56 +8,33 @@ class Connection(_qt.QGraphicsPathItem):
     def __init__(self, *args, **kwargs):
         super(Connection, self).__init__(*args, **kwargs)
         self.source = self.destination = None
-        self._source_pos = self._destination_pos = _qtcore.Qt.QPointF(0, 0)
+        self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
 
     def paint(self, painter, option, widget):
         """Draw a path between the source and destination `Attribute`."""
         self.setZValue(-1)
-        if self.source and not self.destination:
-            # Draw to the mouse cursor.
-            pass
         super(Connection, self).paint(painter, option, widget)
 
-    @property
-    def source_pos(self):
-        """Return the current source position of the `Connection`.
+    def update_path(self, event):
+        """Update the path of this connection.
 
-        :rtype: Qt.QPointF
+        It will be drawn between the source and destination Attributes.
+        If there is no destination attribute, the mouse cursor position
+        will be used instead.
+
+        :param event: Mouse event triggering this update.
         """
-        return self._source_pos
+        if self.source:
+            self.source_pos = self.source.plug_center()
+        else:
+            self.source_pos = event.pos()
+        if self.destination:
+            self.destination_pos = self.destination.plug_center()
+        else:
+            self.destination_pos = event.pos()
 
-    @source_pos.setter
-    def source_pos(self, pos):
-        """Set the start position, from the source attribute.
-
-        :param pos: Start position.
-        :type pos: tuple(float, float) or Qt.QPointF
-        """
-        if not isinstance(pos, _qtcore.Qt.QPointF):
-            pos = _qtcore.Qt.QPointF(pos[0], pos[1])
         path = _qt.QPainterPath()
-        path.quadTo(pos, self.destination_pos)
-        self._source_pos = pos
-        self.setPath(path)
+        path.moveTo(self.source_pos)
+        path.lineTo(self.destination_pos)
 
-    @property
-    def destination_pos(self):
-        """Return the current destination position of the `Connection`.
-
-        :rtype: Qt.QPointF
-        """
-        return self._destination_pos
-
-    @destination_pos.setter
-    def destination_pos(self, pos):
-        """Set the end position, from the source attribute.
-
-        :param pos: End position.
-        :type pos: tuple(float, float) or Qt.QPointF
-        """
-        if not isinstance(pos, _qtcore.Qt.QPointF):
-            pos = _qtcore.Qt.QPointF(pos[0], pos[1])
-        path = _qt.QPainterPath()
-        path.quadTo(self.source_pos, pos)
-        self._destination_pos = pos
         self.setPath(path)
