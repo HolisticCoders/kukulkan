@@ -13,4 +13,5 @@ class GraphWindow(_qt.QMainWindow):
         self.view = _qt.QGraphicsView()
         self.scene = _graph.Graph()
         self.view.setScene(self.scene)
+        self.view.setRenderHints(_qt.QPainter.Antialiasing)
         self.setCentralWidget(self.view)
