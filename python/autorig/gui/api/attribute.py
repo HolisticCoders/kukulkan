@@ -9,7 +9,7 @@ class Attribute(_qt.QGraphicsItem):
         super(Attribute, self).__init__(node)
         self.name = name
         self.node = node
-        self.value = None
+        self._value = None
         self.connections = {}
         self.pending_connection = None
         self.reset()
@@ -49,6 +49,19 @@ class Attribute(_qt.QGraphicsItem):
         self.outer_color = _qt.QColor(200, 180, 150)
         # self.border_color = _qt.QColor(20, 20, 20)
         # self.border_width = 10
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+
+    # @value.getter
+    # def value(self):
+    #     pass
+
 
     def boundingRect(self):
         return _qtcore.QRectF(
