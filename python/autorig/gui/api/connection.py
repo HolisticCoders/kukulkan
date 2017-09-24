@@ -35,6 +35,24 @@ class Connection(_qt.QGraphicsPathItem):
 
         path = _qt.QPainterPath()
         path.moveTo(self.source_pos)
-        path.lineTo(self.destination_pos)
+
+        control_x = self.destination_pos.x() - self.source_pos.x()
+        control_y = self.destination_pos.y() - self.source_pos.y()
+
+        control_source = _qtcore.QPointF(
+            control_x * .5,
+            control_y * .5,
+        )
+
+        control_destination = _qtcore.QPointF(
+            control_x * .5,
+            control_y * .5,
+        )
+
+        path.cubicTo(
+            control_source,
+            control_destination,
+            self.destination_pos,
+        )
 
         self.setPath(path)

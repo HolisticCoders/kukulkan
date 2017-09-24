@@ -13,11 +13,26 @@ class Attribute(_qt.QGraphicsItem):
         self.connections = {}
         self.pending_connection = None
         self.reset()
+        self.is_output = False
+        self.is_input = True
+
+    @property
+    def plug_top_left_corner_x(self):
+        """Return the top left corner of the plug to paint.
+
+        This is required to allow an attribute to be either an
+        input, or an output.
+
+        :rtype: float
+        """
+        if self.is_output:
+            return self.width - self.size * 1.5
+        return self.x
 
     def reset(self):
         self.x = 0
         self.y = 0
-        self.size = 20
+        self.size = 10
         self.width = self.node.width + self.size
 
         self.label_font = _qt.QFont(
@@ -43,25 +58,11 @@ class Attribute(_qt.QGraphicsItem):
         # painter.setPen(self.border_color)
         # painter.pen().setWidth(self.border_width)
 
-        # Paint the outer circle.
-        painter.setBrush(_qt.QBrush(self.outer_color))
-        painter.drawEllipse(
-            self.x,
-            self.y,
-            self.size,
-            self.size,
-        )
+        self.paint_plug(painter, option, widget)
+        self.paint_label(painter, option, widget)
 
-        # Paint the inner circle.
-        inner_size = self.size * .5
-        painter.setBrush(_qt.QBrush(self.inner_color))
-        painter.drawEllipse(
-            self.x + (self.size - inner_size) * .5,
-            self.y + (self.size - inner_size) * .5,
-            inner_size,
-            inner_size,
-        )
-
+    def paint_label(self, painter, option, widget):
+        """Paint the label of the attribute, on the node."""
         painter.setFont(self.label_font)
         painter.setPen(self.node.label_color)
         painter.drawText(
@@ -73,15 +74,26 @@ class Attribute(_qt.QGraphicsItem):
             self.name,
         )
 
-    # def connect(self, destination):
-    #     """Connect this `Attribute` to another one.
-    #
-    #     This `Attribute` will be the source, and the ``destination`` will be
-    #     the driven `Attribute`.
-    #
-    #     :param destination: Destination attribute.
-    #     :type destination: Attribute.
-    #     """
+    def paint_plug(self, painter, option, widget):
+        """Paint the source or destination plug."""
+        # Paint the outer circle.
+        painter.setBrush(_qt.QBrush(self.outer_color))
+        painter.drawEllipse(
+            self.plug_top_left_corner_x,
+            self.y,
+            self.size,
+            self.size,
+        )
+
+        # # Paint the inner circle.
+        # inner_size = self.size * .5
+        # painter.setBrush(_qt.QBrush(self.inner_color))
+        # painter.drawEllipse(
+        #     x + (self.size - inner_size) * .5,
+        #     self.y + (self.size - inner_size) * .5,
+        #     inner_size,
+        #     inner_size,
+        # )
 
     def plug_center(self):
         """Return the center position of the plug part.
@@ -89,7 +101,7 @@ class Attribute(_qt.QGraphicsItem):
         :rtype: PySide.QtCore.QPointF
         """
         return _qtcore.QRectF(
-            self.x,
+            self.plug_top_left_corner_x,
             self.y,
             self.size,
             self.size,
@@ -102,6 +114,11 @@ class Attribute(_qt.QGraphicsItem):
         if self.pending_connection:
             return
 
+        if self.is_input:
+            if self.connections:
+                self.pending_connection = self.connections.values()[0]
+                return
+
         self.pending_connection = _conn.Connection()
         self.pending_connection.setParentItem(self)
         self.pending_connection.source = self
@@ -111,6 +128,7 @@ class Attribute(_qt.QGraphicsItem):
         """Update the `Connection` path."""
         if not self.pending_connection:
             return
+        print id(self.pending_connection)
         self.pending_connection.update_path(event)
 
     def mouseReleaseEvent(self, event):

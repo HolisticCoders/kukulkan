@@ -19,8 +19,10 @@ def main():
     window = autorig.gui.api.window.GraphWindow()
     jong = window.scene.add_node('jong')
     jonhy = window.scene.add_node('johny')
-    jong.add_attribute('rouleau_de_printemps')
-    jonhy.add_attribute('autre_chose')
+    rouleau = jong.add_attribute('rouleau_de_printemps')
+    autre = jonhy.add_attribute('autre_chose')
+    rouleau.is_output = True
+    rouleau.is_input = False
     window.show()
 
     sys.exit(app.exec_())
