@@ -128,7 +128,6 @@ class Attribute(_qt.QGraphicsItem):
         """Update the `Connection` path."""
         if not self.pending_connection:
             return
-        print id(self.pending_connection)
         self.pending_connection.update_path(event)
 
     def mouseReleaseEvent(self, event):
