@@ -12,7 +12,7 @@ class Attribute(_qt.QGraphicsItem):
         super(Attribute, self).__init__(node)
         self.name = name
         self.node = node
-        self.value = None
+        self._value = None
         self.input = None
         self.output = None
         self.connections = {}
@@ -47,6 +47,14 @@ class Attribute(_qt.QGraphicsItem):
             10,
         )
         self.label_offset = 0
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
 
     def boundingRect(self):
         return _qtcore.QRectF(

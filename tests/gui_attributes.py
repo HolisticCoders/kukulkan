@@ -12,18 +12,19 @@ sys.path.append(py_kukulkan)
 
 import autorig.gui.qt.QtGui as _qt
 import autorig.gui.api.window
-import autorig.gui.lib.attributes as _attributes
+import autorig.gui.library.attributes as _attributes
 
 
 def main():
     app = _qt.QApplication(sys.argv)
 
     window = autorig.gui.api.window.GraphWindow()
-    jong = window.scene.add_node('node')
-    rouleau = jong.add_attribute('IntAttr', _attributes.FloatAttribute)
-    rouleau = jong.add_attribute('FloatAttr', _attributes.IntAttribute)
-    rouleau.is_output = True
-    rouleau.is_input = False
+    node1 = window.scene.add_node('node1')
+    node2 = window.scene.add_node('node2')
+    attribute = node1.add_attribute('FloatAttr', _attributes.FloatAttribute)
+    attribute = node2.add_attribute('IntAttr', _attributes.IntAttribute)
+    attribute.is_output = True
+    attribute.is_input = False
     window.show()
 
     sys.exit(app.exec_())

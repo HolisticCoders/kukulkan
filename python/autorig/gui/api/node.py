@@ -38,7 +38,7 @@ class Node(_qt.QGraphicsItem):
         self.label_height = 30
         self.label_offset = 5
 
-        self.attributes_spacing = 5
+        self.attributes_spacing = 15
 
         self.height = self.label_height + self.attributes_spacing
 
