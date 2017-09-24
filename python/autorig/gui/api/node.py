@@ -36,6 +36,8 @@ class Node(_qt.QGraphicsItem):
         self.height = self.label_height + self.attributes_spacing
 
     def add_attribute(self, name, attribute_type):
+        if name in self.attributes:
+            raise KeyError('{} already exists.'.format(self.attributes[name]))
         attribute = attribute_type(name, self)
         self.attributes[name] = attribute
         self.height += self.attributes_spacing + attribute.size
