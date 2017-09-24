@@ -19,7 +19,7 @@ class Node(_qt.QGraphicsItem):
 
         self.x = 0
         self.y = 0
-        self.width = 100
+        self.width = 150
 
         self.roundness = 5
         self.body_color = _qt.QColor(110, 110, 110)
@@ -29,10 +29,10 @@ class Node(_qt.QGraphicsItem):
             12,
             _qt.QFont.Bold
         )
-        self.label_height = 20
-        self.label_offset = 15
+        self.label_height = 30
+        self.label_offset = 5
 
-        self.attributes_spacing = 2
+        self.attributes_spacing = 5
 
         self.height = self.label_height + self.attributes_spacing
 
