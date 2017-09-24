@@ -13,8 +13,13 @@ class Attribute(_qt.QGraphicsItem):
         self.connections = {}
         self.pending_connection = None
         self.reset()
+        self.label_offset = 0
         self.is_output = False
         self.is_input = True
+
+    def __str__(self):
+        """Return the attribute string form."""
+        return '.'.join(map(str, [self.node, self.name]))
 
     @property
     def plug_top_left_corner_x(self):
@@ -66,7 +71,7 @@ class Attribute(_qt.QGraphicsItem):
         painter.setFont(self.label_font)
         painter.setPen(self.node.label_color)
         painter.drawText(
-            self.x,
+            self.x + self.label_offset,
             self.y,
             self.width,
             self.size,
