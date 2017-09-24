@@ -1,6 +1,5 @@
 import autorig.gui.qt.QtGui as _qt
 import autorig.gui.qt.QtCore as _qtcore
-import autorig.gui.api.attribute as _attr
 
 
 class Node(_qt.QGraphicsItem):
@@ -36,8 +35,10 @@ class Node(_qt.QGraphicsItem):
 
         self.height = self.label_height + self.attributes_spacing
 
-    def add_attribute(self, name):
-        attribute = _attr.Attribute(name, self)
+    def add_attribute(self, name, attribute_type):
+        if name in self.attributes:
+            raise KeyError('{} already exists.'.format(self.attributes[name]))
+        attribute = attribute_type(name, self)
         self.attributes[name] = attribute
         self.height += self.attributes_spacing + attribute.size
         attribute.y = (
