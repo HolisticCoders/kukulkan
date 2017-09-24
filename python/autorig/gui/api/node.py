@@ -9,9 +9,16 @@ class Node(_qt.QGraphicsItem):
         super(Node, self).__init__(parent)
         self.name = name
         self.attributes = {}
+        self.plugs = {}
+        self.connections = {}
         self.reset()
 
+    def __str__(self):
+        """Return the string form of the node (its name)."""
+        return str(self.name)
+
     def reset(self):
+        """Reset the graphic state to its initial value."""
         self.setFlag(_qt.QGraphicsItem.ItemIsMovable)
         self.setFlag(_qt.QGraphicsItem.ItemIsSelectable)
         self.setFlag(_qt.QGraphicsItem.ItemIsFocusable)
@@ -39,14 +46,16 @@ class Node(_qt.QGraphicsItem):
         if name in self.attributes:
             raise KeyError('{} already exists.'.format(self.attributes[name]))
         attribute = attribute_type(name, self)
+        attribute.setParentItem(self)
         self.attributes[name] = attribute
         self.height += self.attributes_spacing + attribute.size
-        attribute.y = (
+        attr_x = attribute.size * -0.5
+        attr_y = (
             self.label_height
             + self.attributes_spacing * len(self.attributes)
             + attribute.size * (len(self.attributes) - 1)
         )
-        attribute.x = -.5 * attribute.size
+        attribute.setPos(attr_x, attr_y)
         return attribute
 
     def boundingRect(self):
