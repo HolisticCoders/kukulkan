@@ -19,11 +19,11 @@ def main():
     app = _qt.QApplication(sys.argv)
 
     window = autorig.gui.api.window.GraphWindow()
-    jong = window.scene.add_node('node')
-    rouleau = jong.add_attribute('IntAttr', _attributes.FloatAttribute)
-    rouleau = jong.add_attribute('FloatAttr', _attributes.IntAttribute)
-    rouleau.is_output = True
-    rouleau.is_input = False
+    node = window.scene.add_node('node')
+    attribute = node.add_attribute('IntAttr', _attributes.FloatAttribute)
+    attribute = node.add_attribute('FloatAttr', _attributes.IntAttribute)
+    attribute.is_output = True
+    attribute.is_input = False
     window.show()
 
     sys.exit(app.exec_())
