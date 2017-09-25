@@ -88,18 +88,18 @@ class Plug(_qt.QGraphicsItem):
         if self.pending_connection:
             return
 
-        if self.max_connections is not None:
-            # Meaning there is an actual number of maximum connections
-            # possible.
-            # Usually means this is an input plug, which can only have
-            # one connection, that drives it.
-            if len(self.connections) >= self.max_connections:
-                return
-
-        self.pending_connection = _conn.Connection()
-        self.pending_connection.setParentItem(self)
-        self.pending_connection.source = self
-        self.pending_connection.source_pos = self.boundingRect().center()
+        if self.plug_type == 'input' and self.connections:
+            # Disconnect the `Connection` from this plug.
+            self.pending_connection = self.connections.values()[0]
+            self.pending_connection.previous_destination = self
+            self.pending_connection.destination = None
+            self.pending_connection.is_pending = True
+            self.connections = {}
+        else:
+            self.pending_connection = _conn.Connection()
+            self.pending_connection.setParentItem(self)
+            self.pending_connection.source = self
+            self.pending_connection.source_pos = self.boundingRect().center()
 
     def mouseMoveEvent(self, event):
         """Update the `Connection` path."""
@@ -113,20 +113,38 @@ class Plug(_qt.QGraphicsItem):
             return
         scene = self.scene()
         destination = scene.itemAt(event.scenePos())
+        if not self._validate_connection(destination):
+            self._delete_pending_connection()
+            return
+        self.pending_connection.destination = destination
+        self.connections[str(destination)] = self.pending_connection
+        destination.connections[str(destination)] = self.pending_connection
+        self.pending_connection.is_pending = False
+        self.pending_connection = None
+
+    def _validate_connection(self, destination):
+        """Return `True` if the connection can proceed.
+
+        Basically, a connection is invalid if:
+
+            * There is no destination;
+            * The destination is not a `Plug`;
+            * The destination is already connected;
+            * The source and destination are both inputs or outputs;
+
+        :param destination: Destination of the connection.
+        :type destination: Plug
+        :rtype: bool
+        """
+        if not destination:
+            return None
         if not isinstance(destination, Plug):
-            self._delete_pending_connection()
-        elif str(destination) in self.connections:
-            self._delete_pending_connection()
-        else:
-            self.pending_connection.destination = destination
-            self.connections[str(destination)] = self.pending_connection
-            self.attribute.connections[str(destination)] = self.pending_connection
-            self.node.connections[str(destination)] = self.pending_connection
-            destination.connections[str(destination)] = self.pending_connection
-            destination.attribute.connections[str(destination)] = self.pending_connection
-            destination.node.connections[str(destination)] = self.pending_connection
-            self.pending_connection.is_pending = False
-            self.pending_connection = None
+            return False
+        if destination.connections:
+            return False
+        if self.plug_type == destination.plug_type:
+            return False
+        return True
 
     def _delete_pending_connection(self):
         """Remove the pending connection.
@@ -135,6 +153,13 @@ class Plug(_qt.QGraphicsItem):
         """
         if not self.pending_connection:
             return
+        source = self.pending_connection.source
+        destination = self.pending_connection.destination
+        key = str(self.pending_connection)
+        for plug in [source, destination]:
+            if not plug:
+                continue
+            plug.connections.pop(key, None)
         if self.pending_connection not in self.scene().items():
             return
         self.scene().removeItem(self.pending_connection)
