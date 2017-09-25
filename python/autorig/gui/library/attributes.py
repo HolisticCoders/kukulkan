@@ -17,6 +17,7 @@ class FloatAttribute(NumericAttribute):
         super(FloatAttribute, self).__init__(*args, **kwargs)
         self.widget = self.scene().addWidget(_qt.QDoubleSpinBox())
         self.widget.setParentItem(self)
+        self.widget.setPos(self.x + self.size + 5, self.y)
         self.label_offset = self.size + 5
 
 
@@ -26,6 +27,7 @@ class IntAttribute(NumericAttribute):
         super(IntAttribute, self).__init__(*args, **kwargs)
         self.widget = self.scene().addWidget(_qt.QSpinBox())
         self.widget.setParentItem(self)
+        self.widget.setPos(self.x + self.size + 5, self.y)
         self.label_offset = self.size + 5
 
 
@@ -35,6 +37,7 @@ class BoolAttribute(Attribute):
         super(BoolAttribute, self).__init__(*args, **kwargs)
         self.widget = self.scene().addWidget(_qt.QCheckBox())
         self.widget.setParentItem(self)
+        self.widget.setPos(self.x + self.size + 5, self.y)
         self.label_offset = self.size + 5
 
 
@@ -44,6 +47,7 @@ class StringAttribute(Attribute):
         super(StringAttribute, self).__init__(*args, **kwargs)
         self.widget = self.scene().addWidget(_qt.QLineEdit())
         self.widget.setParentItem(self)
+        self.widget.setPos(self.x + self.size + 5, self.y)
         self.label_offset = self.size + 5
 
 
@@ -53,6 +57,7 @@ class EnumAttribute(Attribute):
         super(EnumAttribute, self).__init__(*args, **kwargs)
         self.widget = self.scene().addWidget(_qt.QComboBox())
         self.widget.setParentItem(self)
+        self.widget.setPos(self.x + self.size + 5, self.y)
         self.label_offset = self.size + 5
 
 

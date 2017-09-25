@@ -70,8 +70,8 @@ class Attribute(_qt.QGraphicsItem):
 
     def paint_label(self, painter, option, widget):
         """Paint the label of the attribute, on the node."""
-        if self.widget is not None:
-            self.widget.setPos(self.x + self.size + 5, self.y)
+        # if self.widget is not None:
+        #     self.widget.setPos(self.x + self.size + 5, self.y)
         painter.setFont(self.label_font)
         painter.setPen(self.node.label_color)
         painter.drawText(
