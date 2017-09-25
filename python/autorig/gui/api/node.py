@@ -67,6 +67,12 @@ class Node(_qt.QGraphicsItem):
         )
 
     def paint(self, painter, option, widget):
+        self.paint_clip(painter, option, widget)
+        self.paint_label(painter, option, widget)
+        self.paint_body(painter, option, widget)
+        self.paint_label_text(painter, option, widget)
+
+    def paint_clip(self, painter, option, widget):
         # Clip the node to make it round.
         clip = _qt.QPainterPath()
         clip.addRoundedRect(
@@ -82,6 +88,7 @@ class Node(_qt.QGraphicsItem):
 
         painter.setPen(_qtcore.Qt.NoPen)
 
+    def paint_label(self, painter, option, widget):
         # Paint the label part.
         painter.setBrush(_qt.QBrush(self.label_color))
         painter.drawRect(
@@ -91,6 +98,7 @@ class Node(_qt.QGraphicsItem):
             self.label_height,
         )
 
+    def paint_body(self, painter, option, widget):
         # Paint the body part.
         painter.setBrush(_qt.QBrush(self.body_color))
         painter.drawRect(
@@ -100,7 +108,8 @@ class Node(_qt.QGraphicsItem):
             self.height - self.label_height,
         )
 
-        # Paint the label
+    def paint_label_text(self, painter, option, widget):
+        # Paint the label text
         painter.setFont(self.label_font)
         painter.setPen(self.body_color)
         painter.drawText(
