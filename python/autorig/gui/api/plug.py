@@ -95,6 +95,7 @@ class Plug(_qt.QGraphicsItem):
             self.pending_connection.destination = None
             self.pending_connection.is_pending = True
             self.connections = {}
+            print str(self), self.connections
         else:
             self.pending_connection = _conn.Connection()
             self.pending_connection.setParentItem(self)
@@ -112,37 +113,50 @@ class Plug(_qt.QGraphicsItem):
         if not self.pending_connection:
             return
         scene = self.scene()
+        source = self.pending_connection.source
         destination = scene.itemAt(event.scenePos())
-        if not self._validate_connection(destination):
+        if not self._validate_connection(source, destination):
             self._delete_pending_connection()
             return
         self.pending_connection.destination = destination
-        self.connections[str(destination)] = self.pending_connection
+        source.connections[str(destination)] = self.pending_connection
         destination.connections[str(destination)] = self.pending_connection
         self.pending_connection.is_pending = False
         self.pending_connection = None
 
-    def _validate_connection(self, destination):
+    @staticmethod
+    def _validate_connection(source, destination):
         """Return `True` if the connection can proceed.
 
         Basically, a connection is invalid if:
 
-            * There is no destination;
+            * There is no source or destination;
             * The destination is not a `Plug`;
             * The destination is already connected;
             * The source and destination are both inputs or outputs;
 
+        :param source: Source of the connection.
         :param destination: Destination of the connection.
+        :type source: Plug
         :type destination: Plug
         :rtype: bool
         """
+        print 'source:', source, 'destination:', destination
+        if not source:
+            print 'No source'
+            return False
         if not destination:
+            print 'No destination'
             return None
         if not isinstance(destination, Plug):
+            print str(destination), 'is not a plug.'
             return False
         if destination.connections:
+            print destination.connections
+            print str(destination), 'already has connections.'
             return False
-        if self.plug_type == destination.plug_type:
+        if source.plug_type == destination.plug_type:
+            print str(destination), 'and', str(source), 'are both', source.plug_type
             return False
         return True
 
