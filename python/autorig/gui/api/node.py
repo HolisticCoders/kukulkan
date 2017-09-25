@@ -10,12 +10,21 @@ class Node(_qt.QGraphicsItem):
         self.name = name
         self.attributes = {}
         self.plugs = {}
-        self.connections = {}
         self.reset()
 
     def __str__(self):
         """Return the string form of the node (its name)."""
         return str(self.name)
+
+    @property
+    def connections(self):
+        """Return the connections of this `Node`."""
+        connections = {}
+        for plug in [self.input, self.output]:
+            if plug is None:
+                continue
+            connections.update(plug.connections)
+        return connections
 
     def reset(self):
         """Reset the graphic state to its initial value."""

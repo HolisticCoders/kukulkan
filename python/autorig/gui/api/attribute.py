@@ -15,13 +15,22 @@ class Attribute(_qt.QGraphicsItem):
         self._value = None
         self.input = None
         self.output = None
-        self.connections = {}
         self.reset()
         self._create_plugs()
 
     def __str__(self):
         """Return the attribute string form."""
         return '.'.join(map(str, [self.node, self.name]))
+
+    @property
+    def connections(self):
+        """Return the connections of this `Attribute`."""
+        connections = {}
+        for plug in [self.input, self.output]:
+            if plug is None:
+                continue
+            connections.update(plug.connections)
+        return connections
 
     @property
     def plug_top_left_corner_x(self):
