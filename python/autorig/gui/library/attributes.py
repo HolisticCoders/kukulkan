@@ -9,39 +9,51 @@ class MessageAttribute(Attribute):
 
 class NumericAttribute(Attribute):
     """Base class for numeric attributes."""
-    def paint_label(self, painter, option, widget):
-        self.spinbox.setPos(self.x + self.size + 5, self.y)
-        super(NumericAttribute, self).paint_label(painter, option, widget)
 
 
 class FloatAttribute(NumericAttribute):
     """Float attribute."""
     def __init__(self, *args, **kwargs):
-        super(NumericAttribute, self).__init__(*args, **kwargs)
-        self.spinbox = self.scene().addWidget(_qt.QDoubleSpinBox())
-        self.spinbox.setParentItem(self)
+        super(FloatAttribute, self).__init__(*args, **kwargs)
+        self.widget = self.scene().addWidget(_qt.QDoubleSpinBox())
+        self.widget.setParentItem(self)
         self.label_offset = self.size + 5
 
 
 class IntAttribute(NumericAttribute):
     """Int attribute."""
     def __init__(self, *args, **kwargs):
-        super(NumericAttribute, self).__init__(*args, **kwargs)
-        self.spinbox = self.scene().addWidget(_qt.QSpinBox())
-        self.spinbox.setParentItem(self)
+        super(IntAttribute, self).__init__(*args, **kwargs)
+        self.widget = self.scene().addWidget(_qt.QSpinBox())
+        self.widget.setParentItem(self)
         self.label_offset = self.size + 5
 
 
 class BoolAttribute(Attribute):
     """Bool attribute."""
+    def __init__(self, *args, **kwargs):
+        super(BoolAttribute, self).__init__(*args, **kwargs)
+        self.widget = self.scene().addWidget(_qt.QCheckBox())
+        self.widget.setParentItem(self)
+        self.label_offset = self.size + 5
 
 
 class StringAttribute(Attribute):
     """String attribute."""
+    def __init__(self, *args, **kwargs):
+        super(StringAttribute, self).__init__(*args, **kwargs)
+        self.widget = self.scene().addWidget(_qt.QLineEdit())
+        self.widget.setParentItem(self)
+        self.label_offset = self.size + 5
 
 
 class EnumAttribute(Attribute):
     """Enum attribute."""
+    def __init__(self, *args, **kwargs):
+        super(EnumAttribute, self).__init__(*args, **kwargs)
+        self.widget = self.scene().addWidget(_qt.QComboBox())
+        self.widget.setParentItem(self)
+        self.label_offset = self.size + 5
 
 
 class ColorAttribute(Attribute):
