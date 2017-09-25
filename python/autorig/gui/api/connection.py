@@ -1,3 +1,5 @@
+import time
+
 import autorig.gui.qt.QtGui as _qt
 import autorig.gui.qt.QtCore as _qtcore
 
@@ -11,11 +13,6 @@ class Connection(_qt.QGraphicsPathItem):
         self.source = self.destination = None
         self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
         self.mouse_cursor_pos = _qtcore.QPointF(0, 0)
-
-    def paint(self, painter, option, widget):
-        """Draw a path between the source and destination `Attribute`."""
-        self.setZValue(-1)
-        super(Connection, self).paint(painter, option, widget)
 
     def update_path(self, event=None):
         """Update the path of this connection.
@@ -31,7 +28,10 @@ class Connection(_qt.QGraphicsPathItem):
         elif event:
             self.source_pos = event.pos()
         if self.destination:
-            self.destination_pos = self.destination.boundingRect().center()
+            self.destination_pos = self.destination.mapToItem(
+                self.source,
+                self.destination.boundingRect().center(),
+            )
         elif event:
             self.destination_pos = event.pos()
 
@@ -60,7 +60,10 @@ class Connection(_qt.QGraphicsPathItem):
         self.setPath(path)
 
     def paint(self, painter, option, widget):
+        """Draw a path between the source and destination `Attribute`."""
         if not self.is_pending:
             self.update_path()
-            print 'has updated'
+        self.setZValue(-1)
+        painter.setBrush(_qt.QColor(0, 0, 0))
+        painter.setPen(_qt.QPen(_qt.QBrush(_qt.QColor(0, 0, 0)), 5))
         super(Connection, self).paint(painter, option, widget)
