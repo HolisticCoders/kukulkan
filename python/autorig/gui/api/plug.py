@@ -96,6 +96,8 @@ class Plug(_qt.QGraphicsItem):
             self.pending_connection.is_pending = True
             self.connections = {}
             print str(self), self.connections
+        elif self.plug_type == 'input':
+            return
         else:
             self.pending_connection = _conn.Connection()
             self.pending_connection.setParentItem(self)
