@@ -34,7 +34,7 @@ class Node(_qt.QGraphicsItem):
 
         self.x = 0
         self.y = 0
-        self.width = 150
+        self.width = 175
 
         self.roundness = 5
         self.body_color = _qt.QColor(110, 110, 110)
