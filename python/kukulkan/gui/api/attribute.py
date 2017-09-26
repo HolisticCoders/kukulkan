@@ -13,10 +13,14 @@ class Attribute(_qt.QGraphicsItem):
         self.name = name
         self.node = node
         self._value = None
+        self.widget = None
         self.input = None
         self.output = None
         self.reset()
         self._create_plugs()
+        self.create_widget()
+        if self.widget is not None:
+            self._place_widget()
 
     def __str__(self):
         """Return the attribute string form."""
@@ -57,6 +61,25 @@ class Attribute(_qt.QGraphicsItem):
         )
         self.label_offset = 0
 
+    def create_widget(self):
+        """Create the widget of this attribute.
+
+        Override when subclassing to add a widget to the attribute.
+        You want to set the variable self.widget like so:
+            self.widget = self.scene().addWidget(_qt.QDoubleSpinBox())
+        This is also the place to set the label_offset and anything that
+        is affected by the presence of the widget.
+        """
+
+    def _place_widget(self):
+        self.widget.setParentItem(self)
+        widget_height = self.widget.widget().height()
+        widget_offset = (self.size - widget_height) / 2
+        self.widget.setPos(
+            self.x + self.size + 5,
+            self.y + widget_offset
+        )
+
     @property
     def value(self):
         return self._value
@@ -79,8 +102,6 @@ class Attribute(_qt.QGraphicsItem):
 
     def paint_label(self, painter, option, widget):
         """Paint the label of the attribute, on the node."""
-        # if self.widget is not None:
-        #     self.widget.setPos(self.x + self.size + 5, self.y)
         painter.setFont(self.label_font)
         painter.setPen(self.node.label_color)
         painter.drawText(
