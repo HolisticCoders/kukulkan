@@ -79,7 +79,7 @@ class Attribute(_qt.QGraphicsItem):
             self.x + self.size + 5,
             self.y + widget_offset
         )
-        self.label_offset = self.widget.widget().width() - 30
+        self.label_offset = self.widget.widget().width() - 40
 
     @property
     def value(self):
