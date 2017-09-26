@@ -2,18 +2,18 @@ import sys
 import os
 
 
-kukulkan = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-py_kukulkan = os.path.join(kukulkan, 'python')
+kukulkan_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+py_kukulkan = os.path.join(kukulkan_path, 'python')
 
 
 sys.path.append(py_kukulkan)
 
 
-import autorig.amate.api
+import kukulkan.amate.api
 
 
 def add_node_type(name, attributes):
-    node = autorig.amate.api.Node()
+    node = kukulkan.amate.api.Node()
     for a_name, a_type in attributes.iteritems():
         node.add_child(a_name, a_type)
     node.save(name, 'dev')

@@ -6,4 +6,4 @@ py_kukulkan = os.path.join(kukulkan, 'python')
 
 sys.path.append(py_kukulkan)
 
-import autorig.
+import kukulkan.

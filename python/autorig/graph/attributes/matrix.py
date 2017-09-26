@@ -1,4 +1,4 @@
-from autorig.graph.api import Attribute
+from kukulkan.graph.api import Attribute
 
 
 class Matrix(Attribute):

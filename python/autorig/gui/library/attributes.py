@@ -1,6 +1,6 @@
-from autorig.gui.api.attribute import Attribute
-import autorig.gui.qt.QtGui as _qt
-import autorig.gui.qt.QtCore as _qtcore
+from kukulkan.gui.api.attribute import Attribute
+import kukulkan.gui.qt.QtGui as _qt
+import kukulkan.gui.qt.QtCore as _qtcore
 
 
 class MessageAttribute(Attribute):

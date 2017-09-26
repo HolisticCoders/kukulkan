@@ -1,6 +1,6 @@
-import autorig.gui.qt.QtGui as _qt
-import autorig.gui.qt.QtCore as _qtcore
-import autorig.gui.api.connection as _conn
+import kukulkan.gui.qt.QtGui as _qt
+import kukulkan.gui.qt.QtCore as _qtcore
+import kukulkan.gui.api.connection as _conn
 
 
 class Plug(_qt.QGraphicsItem):

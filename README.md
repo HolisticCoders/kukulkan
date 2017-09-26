@@ -1,2 +1,2 @@
 # Kukulkan
-Kukulkan is a fully nodal autorig written in python.
+Kukulkan is a fully nodal kukulkan written in python.

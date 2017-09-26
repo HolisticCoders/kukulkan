@@ -1,5 +1,5 @@
-from autorig.graph.api import Node
-from autorig.graph.attributes.matrix import XForm
+from kukulkan.graph.api import Node
+from kukulkan.graph.attributes.matrix import XForm
 
 
 class Transform(Node):

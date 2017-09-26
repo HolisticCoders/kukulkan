@@ -10,17 +10,17 @@ py_kukulkan = os.path.join(kukulkan, 'python')
 sys.path.append(py_kukulkan)
 
 
-import autorig.graph.api
-import autorig.graph.nodes.transform
+import kukulkan.graph.api
+import kukulkan.graph.nodes.transform
 
 
 def main():
-    graph = autorig.graph.api.Graph()
-    trs1 = autorig.graph.nodes.transform.Transform('trs1')
-    trs2 = autorig.graph.nodes.transform.Transform('trs2')
-    trs3 = autorig.graph.nodes.transform.Transform('trs3')
-    trs4 = autorig.graph.nodes.transform.Transform('trs4')
-    trs5 = autorig.graph.nodes.transform.Transform('trs5')
+    graph = kukulkan.graph.api.Graph()
+    trs1 = kukulkan.graph.nodes.transform.Transform('trs1')
+    trs2 = kukulkan.graph.nodes.transform.Transform('trs2')
+    trs3 = kukulkan.graph.nodes.transform.Transform('trs3')
+    trs4 = kukulkan.graph.nodes.transform.Transform('trs4')
+    trs5 = kukulkan.graph.nodes.transform.Transform('trs5')
 
     def iter_nodes():
         yield trs1

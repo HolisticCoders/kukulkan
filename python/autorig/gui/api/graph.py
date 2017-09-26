@@ -1,6 +1,6 @@
-import autorig.gui.qt.QtGui as _qt
+import kukulkan.gui.qt.QtGui as _qt
 
-import autorig.gui.api.node as _node
+import kukulkan.gui.api.node as _node
 
 
 class Graph(_qt.QGraphicsScene):
