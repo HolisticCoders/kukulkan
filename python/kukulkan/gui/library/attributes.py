@@ -37,6 +37,7 @@ class StringAttribute(Attribute):
     def create_widget(self):
         super(StringAttribute, self).create_widget()
         self.widget = self.scene().addWidget(_qt.QLineEdit())
+        self.widget.widget().resize(75, 31)
 
 
 class EnumAttribute(Attribute):
