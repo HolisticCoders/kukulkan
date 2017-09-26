@@ -16,7 +16,6 @@ class FloatAttribute(NumericAttribute):
     def create_widget(self):
         super(FloatAttribute, self).create_widget()
         self.widget = self.scene().addWidget(_qt.QDoubleSpinBox())
-        self.label_offset = self.size + 5
 
 
 class IntAttribute(NumericAttribute):
@@ -24,7 +23,6 @@ class IntAttribute(NumericAttribute):
     def create_widget(self):
         super(IntAttribute, self).create_widget()
         self.widget = self.scene().addWidget(_qt.QSpinBox())
-        self.label_offset = self.size + 5
 
 
 class BoolAttribute(Attribute):
@@ -32,7 +30,6 @@ class BoolAttribute(Attribute):
     def create_widget(self):
         super(BoolAttribute, self).create_widget()
         self.widget = self.scene().addWidget(_qt.QCheckBox())
-        self.label_offset = self.size + 5
 
 
 class StringAttribute(Attribute):
@@ -40,7 +37,6 @@ class StringAttribute(Attribute):
     def create_widget(self):
         super(StringAttribute, self).create_widget()
         self.widget = self.scene().addWidget(_qt.QLineEdit())
-        self.label_offset = self.size + 5
 
 
 class EnumAttribute(Attribute):
@@ -48,7 +44,6 @@ class EnumAttribute(Attribute):
     def create_widget(self):
         super(EnumAttribute, self).create_widget()
         self.widget = self.scene().addWidget(_qt.QComboBox())
-        self.label_offset = self.size + 5
 
 
 class ColorAttribute(Attribute):
