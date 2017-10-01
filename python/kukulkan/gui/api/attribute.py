@@ -5,10 +5,7 @@ import kukulkan.gui.api.plug as _plug
 
 class Attribute(_qt.QGraphicsItem):
 
-    is_input = True
-    is_output = True
-
-    def __init__(self, name, node):
+    def __init__(self, name, node, is_input=True, is_output=True):
         super(Attribute, self).__init__(node)
         self.name = name
         self.node = node
@@ -16,6 +13,8 @@ class Attribute(_qt.QGraphicsItem):
         self.widget = None
         self.input = None
         self.output = None
+        self._is_input = is_input
+        self._is_output = is_output
         self.reset()
         self._create_plugs()
         self.create_widget()
@@ -89,6 +88,26 @@ class Attribute(_qt.QGraphicsItem):
     def value(self, value):
         self._value = value
 
+    @property
+    def is_input(self):
+        return self._is_input
+
+    @is_input.setter
+    def is_input(self, value):
+        self._is_input = value
+        if value == False:
+            self._del_input()
+
+    @property
+    def is_output(self):
+        return self._is_output
+
+    @is_output.setter
+    def is_output(self, value):
+        self._is_output = value
+        if value == False:
+            self._del_output()
+
     def boundingRect(self):
         return _qtcore.QRectF(
             self.x,
@@ -136,3 +155,15 @@ class Attribute(_qt.QGraphicsItem):
             self.width - self.size,
             self.y
         )
+
+    def _del_input(self):
+        if self.input not in self.scene().items():
+            return
+        self.scene().removeItem(self.input)
+        self._is_input = False
+
+    def _del_output(self):
+        if self.output not in self.scene().items():
+            return
+        self.scene().removeItem(self.output)
+        self._is_output = False
