@@ -25,11 +25,19 @@ def main():
     node4 = window.scene.add_node('String')
     node5 = window.scene.add_node('Enum')
 
-    node1.add_attribute('FloatAttr', _attributes.FloatAttribute)
-    node2.add_attribute('IntAttr', _attributes.IntAttribute)
-    node3.add_attribute('BoolAttr', _attributes.BoolAttribute)
-    node4.add_attribute('StringAttr', _attributes.StringAttribute)
-    node5.add_attribute('EnumAttr', _attributes.EnumAttribute)
+    attr1 = node1.add_attribute('FloatAttr', _attributes.FloatAttribute)
+    attr2 = node2.add_attribute('IntAttr', _attributes.IntAttribute)
+    attr3 = node3.add_attribute('BoolAttr', _attributes.BoolAttribute)
+    attr4 = node4.add_attribute('StringAttr', _attributes.StringAttribute)
+    attr5 = node5.add_attribute('EnumAttr', _attributes.EnumAttribute)
+
+    attr1.is_input=False
+    attr1.is_output=False
+    attr2.is_output=False
+    attr3.is_input=False
+    attr4.is_output=False
+    attr5.is_input=False
+
     window.show()
 
     sys.exit(app.exec_())
