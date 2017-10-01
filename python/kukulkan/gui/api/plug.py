@@ -99,9 +99,9 @@ class Plug(_qt.QGraphicsItem):
         elif self.plug_type == 'input':
             return
         else:
-            self.pending_connection = _conn.Connection()
+            self.pending_connection = _conn.PendingConnection()
             self.pending_connection.setParentItem(self)
-            self.pending_connection.source = self
+            self.pending_connection.plug = self
             self.pending_connection.source_pos = self.boundingRect().center()
 
     def mouseMoveEvent(self, event):
@@ -115,16 +115,16 @@ class Plug(_qt.QGraphicsItem):
         if not self.pending_connection:
             return
         scene = self.scene()
-        source = self.pending_connection.source
+        source = self.pending_connection.plug
         destination = scene.itemAt(event.scenePos())
-        if not self._validate_connection(source, destination):
-            self._delete_pending_connection()
-            return
-        self.pending_connection.destination = destination
-        source.connections[str(destination)] = self.pending_connection
-        destination.connections[str(destination)] = self.pending_connection
-        self.pending_connection.is_pending = False
-        self.pending_connection = None
+        if self._validate_connection(source, destination):
+            conn = _conn.Connection()
+            conn.setParentItem(self)
+            conn.source = source
+            conn.destination = destination
+            source.connections[str(destination)] = conn
+            destination.connections[str(destination)] = conn
+        self._delete_pending_connection()
 
     @staticmethod
     def _validate_connection(source, destination):
@@ -169,8 +169,8 @@ class Plug(_qt.QGraphicsItem):
         """
         if not self.pending_connection:
             return
-        source = self.pending_connection.source
-        destination = self.pending_connection.destination
+        source = self.pending_connection.plug
+        destination = None
         key = str(self.pending_connection)
         for plug in [source, destination]:
             if not plug:

@@ -134,4 +134,4 @@ class Node(_qt.QGraphicsItem):
         super(Node, self).mouseMoveEvent(event)
         for attribute in self.attributes.values():
             for connection in attribute.connections.values():
-                connection.update_path(event)
+                connection.compute_path()

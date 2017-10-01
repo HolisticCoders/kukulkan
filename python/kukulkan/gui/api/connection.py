@@ -2,45 +2,33 @@ import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
 
 
-class Connection(_qt.QGraphicsPathItem):
-    """A connection between to attributes."""
+class BaseConnection(_qt.QGraphicsPathItem):
+    """A connectin object.
+
+    This class handles basic mechanics of connections, like
+    path drawing, thickness, etc...
+    """
 
     def __init__(self, *args, **kwargs):
-        super(Connection, self).__init__(*args, **kwargs)
-        self.is_pending = True
-        self.previous_destination = None
-        self.source = self.destination = None
-        self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
-        self.mouse_cursor_pos = _qtcore.QPointF(0, 0)
+        super(BaseConnection, self).__init__(*args, **kwargs)
         self.setZValue(-3)
+        self.stroker = _qt.QPainterPathStroker()
+        self.stroker.setWidth(5)
+        self.stroker.setCapStyle(_qtcore.Qt.RoundCap)
+        self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
 
-    def update_path(self, event=None):
-        """Update the path of this connection.
+    def compute_path(self):
+        """Compute the path of this connection.
 
-        It will be drawn between the source and destination Attributes.
-        If there is no destination attribute, the mouse cursor position
-        will be used instead.
+        The computed path will be drawn between the source_pos and
+        destination_pos of this connection.
 
-        :param event: Mouse event triggering this update.
+        This method requires `BaseConnection.source_pos` and
+        `BaseConnection.destination_pos` attributes to be set.
+        Both must be `PySide.QtCore.QPointF` attributes or present
+        a similar interface (`PySide.QtCore.QPointF.x` and
+        `PySide.QtCore.QPointF.y` are used in particular).
         """
-        if self.source:
-            self.source_pos = self.source.boundingRect().center()
-        elif event:
-            self.source_pos = event.pos()
-        if self.destination:
-            self.destination_pos = self.destination.mapToItem(
-                self.source,
-                self.destination.boundingRect().center(),
-            )
-        elif event:
-            if self.previous_destination and self.source:
-                self.destination_pos = self.previous_destination.mapToItem(
-                    self.source,
-                    event.pos(),
-                )
-            else:
-                self.destination_pos = event.pos()
-
         path = _qt.QPainterPath()
         path.moveTo(self.source_pos)
 
@@ -63,12 +51,68 @@ class Connection(_qt.QGraphicsPathItem):
             self.destination_pos,
         )
 
-        self.setPath(path)
+        stroker = _qt.QPainterPathStroker()
+        stroker.setWidth(5)
+        stroker.setCapStyle(_qtcore.Qt.RoundCap)
+
+        self.setPath(stroker.createStroke(path))
 
     def paint(self, painter, option, widget):
         """Draw a path between the source and destination `Attribute`."""
-        if not self.is_pending:
-            self.update_path()
+        print 'painting'
+        self.compute_path()
         painter.setBrush(_qt.QColor(0, 0, 0))
         painter.setPen(_qt.QPen(_qt.QBrush(_qt.QColor(0, 0, 0)), 5))
-        super(Connection, self).paint(painter, option, widget)
+        super(BaseConnection, self).paint(painter, option, widget)
+
+
+class PendingConnection(BaseConnection):
+    """A `Connection` not yet connected between two `Plug` objects.
+
+    This is used when a user begins to drag a `Connection` between
+    two `Plug` objects.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(PendingConnection, self).__init__(*args, **kwargs)
+        self.plug = None
+
+    def update_path(self, mouse_event):
+        """Update the path of this connection.
+
+        The path is updated by plugs asking for this `PendingConnection`.
+
+        :param mouse_event: Event triggering the update. This is passed
+                            by the owner `Plug` in its mouseMoveEvent.
+        :type mouse_event:
+        """
+        if not self.plug:
+            return
+        self.source_pos = self.plug.boundingRect().center()
+        self.destination_pos = mouse_event.pos()
+        # print self, self.source_pos, self.destination_pos
+        self.compute_path()
+
+
+class Connection(BaseConnection):
+    """A connection between to attributes."""
+
+    def __init__(self, *args, **kwargs):
+        super(Connection, self).__init__(*args, **kwargs)
+        self.source = self.destination = None
+
+    def compute_path(self):
+        """Update the path of this connection.
+
+        It will be drawn between the source and destination Attributes.
+        If there is no destination attribute, the mouse cursor position
+        will be used instead.
+        """
+        if self.source:
+            self.source_pos = self.source.boundingRect().center()
+        if self.destination:
+            self.destination_pos = self.destination.mapToItem(
+                self.source,
+                self.destination.boundingRect().center(),
+            )
+        super(Connection, self).compute_path()
