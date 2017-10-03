@@ -18,8 +18,11 @@ class Attribute(_qt.QGraphicsItem):
         self.reset()
         self._create_plugs()
         self.create_widget()
-        if self.widget is not None:
-            self._place_widget()
+        if self.widget:
+            self.left_layout.addWidget(self.widget)
+            # really temp stuff
+            # self.widget.setStyleSheet("background-color: #232729")
+
 
     def __str__(self):
         """Return the attribute string form."""
@@ -58,7 +61,12 @@ class Attribute(_qt.QGraphicsItem):
             'Helvetica [Cronyx]',
             10,
         )
-        self.label_offset = 0
+        self.label_offset = 5
+        # TODO: This needs to change based on is_input/is_output
+        self.label_x = self.x + self.label_offset
+        self.label_width = self.width
+        self.label_alignment = _qtcore.Qt.AlignRight
+        self.widget_x = self.x + self.size 
 
     def create_widget(self):
         """Create the widget of this attribute.
@@ -69,16 +77,30 @@ class Attribute(_qt.QGraphicsItem):
         This is also the place to set the label_offset and anything that
         is affected by the presence of the widget.
         """
+        baseWidget = _qt.QWidget()
+        baseWidget.setStyleSheet("background-color: transparent")
+        baseWidget.resize(self.node.width - self.size, 50)
+        layout = _qt.QHBoxLayout()
+        baseWidget.setLayout(layout)
 
-    def _place_widget(self):
-        self.widget.setParentItem(self)
-        widget_height = self.widget.widget().height()
+        self.left_layout = _qt.QHBoxLayout()
+        self.right_layout = _qt.QHBoxLayout()
+        self.left_layout.setAlignment(_qtcore.Qt.AlignLeft)
+        self.right_layout.setAlignment(_qtcore.Qt.AlignRight)
+        layout.addLayout(self.left_layout)
+        layout.addLayout(self.right_layout)
+
+        self.label = _qt.QLabel(self.name)
+        self.right_layout.addWidget(self.label)
+        self.baseWidget = self.scene().addWidget(baseWidget)
+        self.baseWidget.setParentItem(self)
+        widget_height = self.baseWidget.widget().height()
         widget_offset = (self.size - widget_height) / 2
-        self.widget.setPos(
-            self.x + self.size + 5,
+        self.baseWidget.setPos(
+            self.widget_x,
             self.y + widget_offset
         )
-        self.label_offset = self.widget.widget().width() - 40
+
 
     @property
     def value(self):
@@ -94,9 +116,16 @@ class Attribute(_qt.QGraphicsItem):
 
     @is_input.setter
     def is_input(self, value):
-        self._is_input = value
-        if value == False:
-            self._del_input()
+        old_value = self.is_input
+        if value != old_value:
+            self._is_input = value
+            if value is False:
+                self._del_input()
+                if self.is_output:
+                    self.right_layout.removeWidget(self.label)
+                    self.left_layout.removeWidget(self.widget)
+                    self.right_layout.addWidget(self.widget)
+                    self.left_layout.addWidget(self.label)
 
     @property
     def is_output(self):
@@ -104,9 +133,16 @@ class Attribute(_qt.QGraphicsItem):
 
     @is_output.setter
     def is_output(self, value):
-        self._is_output = value
-        if value == False:
-            self._del_output()
+        old_value = self.is_output
+        if value != old_value:
+            self._is_output = value
+            if value is False:
+                self._del_output()
+                if self.is_input:
+                    self.left_layout.removeWidget(self.label)
+                    self.right_layout.removeWidget(self.widget)
+                    self.left_layout.addWidget(self.widget)
+                    self.right_layout.addWidget(self.label)
 
     def boundingRect(self):
         return _qtcore.QRectF(
@@ -118,18 +154,18 @@ class Attribute(_qt.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         painter.setPen(_qtcore.Qt.NoPen)
-        self.paint_label(painter, option, widget)
+        # self.paint_label(painter, option, widget)
 
     def paint_label(self, painter, option, widget):
         """Paint the label of the attribute, on the node."""
         painter.setFont(self.label_font)
         painter.setPen(self.node.label_color)
         painter.drawText(
-            self.x + self.label_offset,
+            self.label_x,
             self.y,
-            self.width,
+            self.label_width,
             self.size,
-            _qtcore.Qt.AlignCenter,
+            self.label_alignment,
             self.name,
         )
 
