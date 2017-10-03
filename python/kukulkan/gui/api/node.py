@@ -1,5 +1,6 @@
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
+import kukulkan.gui.api.attribute as _attribute
 
 
 class Node(_qt.QGraphicsItem):
@@ -47,14 +48,22 @@ class Node(_qt.QGraphicsItem):
         self.label_height = 30
         self.label_offset = 5
 
-        self.attributes_spacing = 25
+        self.attributes_spacing = 20
 
         self.height = self.label_height + self.attributes_spacing
 
-    def add_attribute(self, name, attribute_type):
+    def add_attribute(self, name, attribute_type, plug_type):
         if name in self.attributes:
             raise KeyError('{} already exists.'.format(self.attributes[name]))
-        attribute = attribute_type(name, self)
+
+        if plug_type == 'input':
+            attribute = _attribute.Input
+        elif plug_type == 'output':
+            attribute = _attribute.Output
+        else:
+            return
+
+        attribute = attribute(name, self, attribute_type)
         attribute.setParentItem(self)
         self.attributes[name] = attribute
         self.height += self.attributes_spacing + attribute.size
