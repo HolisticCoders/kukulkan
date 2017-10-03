@@ -96,8 +96,8 @@ class Plug(_qt.QGraphicsItem):
             if conn in self.scene().items():
                 self.scene().removeItem(conn)
             source = conn.source
-        elif self.plug_type == 'input':
-            return
+        # elif self.plug_type == 'input':
+        #     return
         self.create_pending_connection(source)
         self.pending_connection.update_path(event)
 
@@ -112,9 +112,17 @@ class Plug(_qt.QGraphicsItem):
         if not self.pending_connection:
             return
         scene = self.scene()
-        source = self.pending_connection.source
-        destination = scene.itemAt(event.scenePos())
-        if self._validate_connection(source, destination):
+        owner = self.pending_connection.source
+        under_cursor = scene.items(event.scenePos())
+        plugs = [item for item in under_cursor if isinstance(item, Plug)]
+        if plugs:
+            to = plugs[0]
+            if owner.plug_type == 'output':
+                source = owner
+                destination = to
+            else:
+                source = to
+                destination = owner
             source.connect(destination)
         self._delete_pending_connection()
 
@@ -162,7 +170,7 @@ class Plug(_qt.QGraphicsItem):
         elif self.plug_type == 'output':
             source = self
             destination = to
-        if not self._validate_connection(self, to):
+        if not self._validate_connection(source, destination):
             return
         conn = _conn.Connection(source, destination)
         conn.setParentItem(source)
