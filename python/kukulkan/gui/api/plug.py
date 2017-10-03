@@ -186,20 +186,20 @@ class Plug(_qt.QGraphicsItem):
         """
         print 'source:', source, 'destination:', destination
         if not source:
-            print 'No source'
+            # print 'No source'
             return False
         if not destination:
-            print 'No destination'
+            # print 'No destination'
             return None
         if not isinstance(destination, Plug):
-            print str(destination), 'is not a plug.'
+            # print str(destination), 'is not a plug.'
             return False
         if destination.connections:
-            print destination.connections
-            print str(destination), 'already has connections.'
+            # print destination.connections
+            # print str(destination), 'already has connections.'
             return False
         if source.plug_type == destination.plug_type:
-            print str(destination), 'and', str(source), 'are both', source.plug_type
+            # print str(destination), 'and', str(source), 'are both', source.plug_type
             return False
         return True
 
