@@ -72,9 +72,12 @@ class PendingConnection(BaseConnection):
     two `Plug` objects.
     """
 
-    def __init__(self, *args, **kwargs):
-        super(PendingConnection, self).__init__(*args, **kwargs)
-        self.plug = None
+    def __init__(self, source, owner):
+        super(PendingConnection, self).__init__()
+        self.source = source
+        self.owner = owner
+        self.setParentItem(source)
+        self.source_pos = source.boundingRect().center()
 
     def update_path(self, mouse_event):
         """Update the path of this connection.
@@ -85,19 +88,25 @@ class PendingConnection(BaseConnection):
                             by the owner `Plug` in its mouseMoveEvent.
         :type mouse_event:
         """
-        if not self.plug:
+        if not self.source:
             return
-        self.source_pos = self.plug.boundingRect().center()
-        self.destination_pos = mouse_event.pos()
+        self.source_pos = self.source.boundingRect().center()
+        self.destination_pos = self.owner.mapToItem(
+            self.source,
+            mouse_event.pos(),
+        )
         self.compute_path()
 
 
 class Connection(BaseConnection):
     """A connection between to attributes."""
 
-    def __init__(self, *args, **kwargs):
-        super(Connection, self).__init__(*args, **kwargs)
-        self.source = self.destination = None
+    def __init__(self, source, destination):
+        super(Connection, self).__init__()
+        self.source = source
+        self.destination = destination
+        source.connections[str(destination)] = self
+        destination.connections[str(source)] = self
 
     def compute_path(self):
         """Update the path of this connection.

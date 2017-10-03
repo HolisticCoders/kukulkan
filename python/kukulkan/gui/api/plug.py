@@ -88,21 +88,18 @@ class Plug(_qt.QGraphicsItem):
         if self.pending_connection:
             return
 
+        source = self
         if self.plug_type == 'input' and self.connections:
             # Disconnect the `Connection` from this plug.
-            self.pending_connection = self.connections.values()[0]
-            self.pending_connection.previous_destination = self
-            self.pending_connection.destination = None
-            self.pending_connection.is_pending = True
-            self.connections = {}
-            print str(self), self.connections
+            key, conn = self.connections.popitem()
+            conn.source.connections.pop(str(self))
+            if conn in self.scene().items():
+                self.scene().removeItem(conn)
+            source = conn.source
         elif self.plug_type == 'input':
             return
-        else:
-            self.pending_connection = _conn.PendingConnection()
-            self.pending_connection.setParentItem(self)
-            self.pending_connection.plug = self
-            self.pending_connection.source_pos = self.boundingRect().center()
+        self.create_pending_connection(source)
+        self.pending_connection.update_path(event)
 
     def mouseMoveEvent(self, event):
         """Update the `Connection` path."""
@@ -115,16 +112,60 @@ class Plug(_qt.QGraphicsItem):
         if not self.pending_connection:
             return
         scene = self.scene()
-        source = self.pending_connection.plug
+        source = self.pending_connection.source
         destination = scene.itemAt(event.scenePos())
         if self._validate_connection(source, destination):
-            conn = _conn.Connection()
-            conn.setParentItem(self)
-            conn.source = source
-            conn.destination = destination
-            source.connections[str(destination)] = conn
-            destination.connections[str(destination)] = conn
+            source.connect(destination)
         self._delete_pending_connection()
+
+    def create_pending_connection(self, source=None):
+        """Create a `PendingConnection` and return it.
+
+        If there is already a pending connection, return it.
+
+        You can specify another sourceplug with the ``source`` argument,
+        making the PendingConnection start from another spot.
+
+        :param source: Source plug of this PendingConnection.
+        :type source: Plug
+        :rtype: PendingConnection
+        """
+        if self.pending_connection:
+            return self.pending_connection
+        if source is None:
+            source = self
+        self.pending_connection = _conn.PendingConnection(source, self)
+        return self.pending_connection
+
+    def remove_connection(self, key):
+        """Remove a specific connection, by key.
+
+        A connection key is formatted as follows:
+
+            ``node_name.attribute_name.plug_type``
+
+        :param str key: Name of the connection to remove.
+        """
+        conn = self.connections.pop(key)
+        for plug in (conn.source, conn.destination):
+            if key in plug.connections:
+                plug.connections.pop(key)
+        if conn in self.scene().items():
+            self.scene().removeItem(conn)
+
+    def connect(self, to):
+        """Create a connection between this plug and another one.
+        """
+        if self.plug_type == 'input':
+            source = to
+            destination = self
+        elif self.plug_type == 'output':
+            source = self
+            destination = to
+        if not self._validate_connection(self, to):
+            return
+        conn = _conn.Connection(source, destination)
+        conn.setParentItem(source)
 
     @staticmethod
     def _validate_connection(source, destination):
@@ -169,16 +210,11 @@ class Plug(_qt.QGraphicsItem):
         """
         if not self.pending_connection:
             return
-        source = self.pending_connection.plug
-        destination = None
+        source = self.pending_connection.source
         key = str(self.pending_connection)
-        for plug in [source, destination]:
-            if not plug:
-                continue
-            plug.connections.pop(key, None)
-        if self.pending_connection not in self.scene().items():
-            return
-        self.scene().removeItem(self.pending_connection)
+        source.connections.pop(key, None)
+        if self.pending_connection in self.scene().items():
+            self.scene().removeItem(self.pending_connection)
         self.pending_connection = None
 
 
