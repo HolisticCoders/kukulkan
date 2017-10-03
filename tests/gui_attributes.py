@@ -22,12 +22,24 @@ def main():
 
 
     node1 = window.scene.add_node('node1')
-    attr1 = node1.add_attribute(
+    node1.add_attribute(
         'Float1',
         _attributes.Float,
         'input'
     )
-    attr2 = node1.add_attribute(
+    node1.add_attribute(
+        'Float2',
+        _attributes.Float,
+        'output'
+    )
+
+    node2 = window.scene.add_node('node2')
+    node1.add_attribute(
+        'Float1',
+        _attributes.Float,
+        'input'
+    )
+    node1.add_attribute(
         'Float2',
         _attributes.Float,
         'output'
