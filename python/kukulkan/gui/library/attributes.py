@@ -12,12 +12,10 @@ class AttributeType(_qt.QWidget):
         self.create_widget()
         if self.widget:
             self.left_layout.addWidget(self.widget)
-        if isinstance(self.parent_item) == _attribute.Input:
-            print "input"
+        if isinstance(self.parent_item, _attribute.Input):
             self.left_layout.addWidget(self.widget)
             self.right_layout.addWidget(self.label)
         else:
-            print "output"
             self.left_layout.addWidget(self.label)
             self.right_layout.addWidget(self.widget)
 
