@@ -16,9 +16,6 @@ class BaseConnection(_qt.QGraphicsPathItem):
         self.stroker.setWidth(5)
         self.stroker.setCapStyle(_qtcore.Qt.RoundCap)
         self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
-        self.gradient = _qt.QLinearGradient()
-        self.gradient.setColorAt(0, _qt.QColor(53, 53, 53))
-        self.gradient.setColorAt(1, _qt.QColor(93, 93, 93))
         self.flat_brush = _qt.QBrush(_qt.QColor(73, 73, 73))
 
     def compute_path(self):
@@ -61,15 +58,9 @@ class BaseConnection(_qt.QGraphicsPathItem):
 
         self.setPath(stroker.createStroke(path))
 
-    def update_gradient(self):
-        """Compute the brush gradient of the connection."""
-        self.gradient.setStart(self.source_pos)
-        self.gradient.setFinalStop(self.destination_pos)
-
     def paint(self, painter, option, widget):
         """Draw a path between the source and destination `Attribute`."""
         self.compute_path()
-        # self.update_gradient()
         super(BaseConnection, self).paint(painter, option, widget)
         painter.fillPath(self.path(), self.flat_brush)
 
