@@ -59,7 +59,6 @@ class BaseConnection(_qt.QGraphicsPathItem):
 
     def paint(self, painter, option, widget):
         """Draw a path between the source and destination `Attribute`."""
-        print 'painting'
         self.compute_path()
         painter.setBrush(_qt.QColor(0, 0, 0))
         painter.setPen(_qt.QPen(_qt.QBrush(_qt.QColor(0, 0, 0)), 5))
@@ -90,7 +89,6 @@ class PendingConnection(BaseConnection):
             return
         self.source_pos = self.plug.boundingRect().center()
         self.destination_pos = mouse_event.pos()
-        # print self, self.source_pos, self.destination_pos
         self.compute_path()
 
 
