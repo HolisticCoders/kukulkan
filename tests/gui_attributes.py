@@ -37,25 +37,6 @@ def main():
 
     sys.exit(app.exec_())
 
-def add_node(window, name):
-
-    attr2 = node1.add_attribute(
-        'Float',
-        _attributes.FloatAttribute,
-    )
-    attr3 = node1.add_attribute(
-        'Int',
-        _attributes.IntAttribute,
-    )
-    attr4 = node1.add_attribute(
-        'Bool',
-        _attributes.BoolAttribute,
-    )
-    attr5 = node1.add_attribute(
-        'Enum',
-        _attributes.EnumAttribute,
-    )
-
 
 if __name__ == '__main__':
     main()
