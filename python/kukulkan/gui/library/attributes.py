@@ -15,36 +15,35 @@ class FloatAttribute(NumericAttribute):
     """Float attribute."""
     def create_widget(self):
         super(FloatAttribute, self).create_widget()
-        self.widget = self.scene().addWidget(_qt.QDoubleSpinBox())
+        self.widget = _qt.QDoubleSpinBox()
 
 
 class IntAttribute(NumericAttribute):
     """Int attribute."""
     def create_widget(self):
         super(IntAttribute, self).create_widget()
-        self.widget = self.scene().addWidget(_qt.QSpinBox())
+        self.widget = _qt.QSpinBox()
 
 
 class BoolAttribute(Attribute):
     """Bool attribute."""
     def create_widget(self):
         super(BoolAttribute, self).create_widget()
-        self.widget = self.scene().addWidget(_qt.QCheckBox())
+        self.widget = _qt.QCheckBox()
 
 
 class StringAttribute(Attribute):
     """String attribute."""
     def create_widget(self):
         super(StringAttribute, self).create_widget()
-        self.widget = self.scene().addWidget(_qt.QLineEdit())
-        self.widget.widget().resize(75, 31)
+        self.widget = _qt.QLineEdit()
 
 
 class EnumAttribute(Attribute):
     """Enum attribute."""
     def create_widget(self):
         super(EnumAttribute, self).create_widget()
-        self.widget = self.scene().addWidget(_qt.QComboBox())
+        self.widget = _qt.QComboBox()
 
 
 class ColorAttribute(Attribute):
