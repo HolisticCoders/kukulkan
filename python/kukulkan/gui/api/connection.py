@@ -16,6 +16,10 @@ class BaseConnection(_qt.QGraphicsPathItem):
         self.stroker.setWidth(5)
         self.stroker.setCapStyle(_qtcore.Qt.RoundCap)
         self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
+        self.gradient = _qt.QLinearGradient()
+        self.gradient.setColorAt(0, _qt.QColor(53, 53, 53))
+        self.gradient.setColorAt(1, _qt.QColor(93, 93, 93))
+        self.flat_brush = _qt.QBrush(_qt.QColor(73, 73, 73))
 
     def compute_path(self):
         """Compute the path of this connection.
@@ -57,12 +61,17 @@ class BaseConnection(_qt.QGraphicsPathItem):
 
         self.setPath(stroker.createStroke(path))
 
+    def update_gradient(self):
+        """Compute the brush gradient of the connection."""
+        self.gradient.setStart(self.source_pos)
+        self.gradient.setFinalStop(self.destination_pos)
+
     def paint(self, painter, option, widget):
         """Draw a path between the source and destination `Attribute`."""
         self.compute_path()
-        painter.setBrush(_qt.QColor(0, 0, 0))
-        painter.setPen(_qt.QPen(_qt.QBrush(_qt.QColor(0, 0, 0)), 5))
+        # self.update_gradient()
         super(BaseConnection, self).paint(painter, option, widget)
+        painter.fillPath(self.path(), self.flat_brush)
 
 
 class PendingConnection(BaseConnection):
@@ -72,9 +81,12 @@ class PendingConnection(BaseConnection):
     two `Plug` objects.
     """
 
-    def __init__(self, *args, **kwargs):
-        super(PendingConnection, self).__init__(*args, **kwargs)
-        self.plug = None
+    def __init__(self, source, owner):
+        super(PendingConnection, self).__init__()
+        self.source = source
+        self.owner = owner
+        self.setParentItem(source)
+        self.source_pos = source.boundingRect().center()
 
     def update_path(self, mouse_event):
         """Update the path of this connection.
@@ -85,19 +97,25 @@ class PendingConnection(BaseConnection):
                             by the owner `Plug` in its mouseMoveEvent.
         :type mouse_event:
         """
-        if not self.plug:
+        if not self.source:
             return
-        self.source_pos = self.plug.boundingRect().center()
-        self.destination_pos = mouse_event.pos()
+        self.source_pos = self.source.boundingRect().center()
+        self.destination_pos = self.owner.mapToItem(
+            self.source,
+            mouse_event.pos(),
+        )
         self.compute_path()
 
 
 class Connection(BaseConnection):
     """A connection between to attributes."""
 
-    def __init__(self, *args, **kwargs):
-        super(Connection, self).__init__(*args, **kwargs)
-        self.source = self.destination = None
+    def __init__(self, source, destination):
+        super(Connection, self).__init__()
+        self.source = source
+        self.destination = destination
+        source.connections[str(destination)] = self
+        destination.connections[str(source)] = self
 
     def compute_path(self):
         """Update the path of this connection.
