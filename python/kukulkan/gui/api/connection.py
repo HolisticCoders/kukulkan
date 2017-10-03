@@ -11,7 +11,9 @@ class BaseConnection(_qt.QGraphicsPathItem):
 
     def __init__(self, *args, **kwargs):
         super(BaseConnection, self).__init__(*args, **kwargs)
-        self.setZValue(-3)
+        self.setFlag(_qt.QGraphicsItem.ItemStacksBehindParent)
+        # self.setFlag(_qt.QGraphicsItem.ItemNegativeZStacksBehindParent)
+        # self.setZValue(-3)
         self.stroker = _qt.QPainterPathStroker()
         self.stroker.setWidth(5)
         self.stroker.setCapStyle(_qtcore.Qt.RoundCap)
