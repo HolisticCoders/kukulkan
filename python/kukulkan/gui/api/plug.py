@@ -96,8 +96,6 @@ class Plug(_qt.QGraphicsItem):
             if conn in self.scene().items():
                 self.scene().removeItem(conn)
             source = conn.source
-        # elif self.plug_type == 'input':
-        #     return
         self.create_pending_connection(source)
         self.pending_connection.update_path(event)
 
@@ -143,6 +141,7 @@ class Plug(_qt.QGraphicsItem):
         if source is None:
             source = self
         self.pending_connection = _conn.PendingConnection(source, self)
+        self.grabMouse()
         return self.pending_connection
 
     def remove_connection(self, key):
@@ -155,9 +154,8 @@ class Plug(_qt.QGraphicsItem):
         :param str key: Name of the connection to remove.
         """
         conn = self.connections.pop(key)
-        for plug in (conn.source, conn.destination):
-            if key in plug.connections:
-                plug.connections.pop(key)
+        conn.source.connections.pop(str(conn.destination), None)
+        conn.destination.connections.pop(str(conn.source), None)
         if conn in self.scene().items():
             self.scene().removeItem(conn)
 
@@ -217,6 +215,7 @@ class Plug(_qt.QGraphicsItem):
         if self.pending_connection in self.scene().items():
             self.scene().removeItem(self.pending_connection)
         self.pending_connection = None
+        self.ungrabMouse()
 
 
 class Input(Plug):
