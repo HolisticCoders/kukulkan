@@ -12,8 +12,6 @@ class BaseConnection(_qt.QGraphicsPathItem):
     def __init__(self, *args, **kwargs):
         super(BaseConnection, self).__init__(*args, **kwargs)
         self.setFlag(_qt.QGraphicsItem.ItemStacksBehindParent)
-        # self.setFlag(_qt.QGraphicsItem.ItemNegativeZStacksBehindParent)
-        # self.setZValue(-3)
         self.stroker = _qt.QPainterPathStroker()
         self.stroker.setWidth(5)
         self.stroker.setCapStyle(_qtcore.Qt.RoundCap)
@@ -88,7 +86,7 @@ class PendingConnection(BaseConnection):
 
         :param mouse_event: Event triggering the update. This is passed
                             by the owner `Plug` in its mouseMoveEvent.
-        :type mouse_event:
+        :type mouse_event: PySide.QtGui.QGraphicsSceneMouseEvent
         """
         if not self.source:
             return
@@ -112,6 +110,12 @@ class Connection(BaseConnection):
         self._about_to_disconnect = False
         self._disconnect_from = None
         self._disconnect_attach = None
+        self.setParentItem(source)
+        source.on_connection(destination)
+        destination.on_connection(source)
+
+    def __str__(self):
+        return 'Connection({s.source}, {s.destination})'.format(s=self)
 
     def compute_path(self):
         """Update the path of this connection.
@@ -152,9 +156,13 @@ class Connection(BaseConnection):
             return
         if not self._disconnect_from:
             return
+        self._disconnect_from.create_pending_connection(
+            self._disconnect_attach
+        )
         if str(self._disconnect_attach) in self._disconnect_from.connections:
-            self._disconnect_from.remove_connection(str(self._disconnect_attach))
-        self._disconnect_from.create_pending_connection(self._disconnect_attach)
+            self._disconnect_from.remove_connection(
+                str(self._disconnect_attach)
+            )
 
     def mouseReleaseEvent(self, event):
         self._about_to_disconnect = False
