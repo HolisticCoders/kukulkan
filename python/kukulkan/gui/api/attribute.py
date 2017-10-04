@@ -10,7 +10,6 @@ class Attribute(_qt.QGraphicsItem):
         super(Attribute, self).__init__(node)
         self.name = name
         self.node = node
-        self.value = None
         self.plug = None
         self.type = attribute_type
 
@@ -33,6 +32,10 @@ class Attribute(_qt.QGraphicsItem):
         if self.plug is not None:
             connections.update(self.plug.connections)
             return connections
+
+    @property
+    def value(self):
+        return self.base_widget.value
 
     def reset(self):
         """Reset the graphic state to its initial value."""
