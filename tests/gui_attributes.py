@@ -12,7 +12,6 @@ sys.path.append(py_kukulkan)
 
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.api.window
-import kukulkan.gui.library.attributes as _attributes
 
 
 def main():
@@ -23,26 +22,56 @@ def main():
 
     node1 = window.scene.add_node('node1')
     node1.add_attribute(
-        'Float1',
-        _attributes.Float,
-        'input'
+        name='Integer',
+        attribute_type='integer',
+        plug_type='input'
     )
     node1.add_attribute(
-        'Float2',
-        _attributes.Float,
-        'output'
+        name='Float',
+        attribute_type='float',
+        plug_type='input'
+    )
+    node1.add_attribute(
+        name='Boolean',
+        attribute_type='boolean',
+        plug_type='input'
+    )
+    node1.add_attribute(
+        name='String',
+        attribute_type='string',
+        plug_type='input'
+    )
+    node1.add_attribute(
+        name='Enum',
+        attribute_type='enum',
+        plug_type='input'
     )
 
     node2 = window.scene.add_node('node2')
     node2.add_attribute(
-        'Float1',
-        _attributes.Float,
-        'input'
+        name='Integer',
+        attribute_type='integer',
+        plug_type='output'
     )
     node2.add_attribute(
-        'Float2',
-        _attributes.Float,
-        'output'
+        name='Float',
+        attribute_type='float',
+        plug_type='output'
+    )
+    node2.add_attribute(
+        name='Boolean',
+        attribute_type='boolean',
+        plug_type='output'
+    )
+    node2.add_attribute(
+        name='String',
+        attribute_type='string',
+        plug_type='output'
+    )
+    node2.add_attribute(
+        name='Enum',
+        attribute_type='enum',
+        plug_type='output'
     )
 
     window.show()
