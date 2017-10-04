@@ -172,6 +172,19 @@ class Plug(_qt.QGraphicsItem):
             return
         conn = _conn.Connection(source, destination)
         conn.setParentItem(source)
+    def on_connection(self, other):
+        """Method called when this `Plug` gets connected.
+
+        :param other: Other `Plug` connected to this one.
+        :type other: Plug
+        """
+
+    def on_disconnection(self, other):
+        """Method called when this `Plug` gets disconnected.
+
+        :param other: Other `Plug` disconnected from this one.
+        :type other: Plug
+        """
 
     @staticmethod
     def _validate_connection(source, destination):
