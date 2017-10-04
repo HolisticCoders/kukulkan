@@ -91,11 +91,9 @@ class Plug(_qt.QGraphicsItem):
         source = self
         if self.plug_type == 'input' and self.connections:
             # Disconnect the `Connection` from this plug.
-            key, conn = self.connections.popitem()
-            conn.source.connections.pop(str(self))
-            if conn in self.scene().items():
-                self.scene().removeItem(conn)
+            conn = self.connections.values()[0]
             source = conn.source
+            self.remove_connection(self.connections.keys()[0])
         self.create_pending_connection(source)
         self.pending_connection.update_path(event)
 
