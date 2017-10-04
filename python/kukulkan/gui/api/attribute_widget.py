@@ -24,7 +24,7 @@ class AttributeWidget(_qt.QWidget):
         self.myWidth = self.node.width - self.parent_item.size
         self.myHeight = 50
         self.setStyleSheet("background-color: transparent")
-        self.resize(self.myWidth , self.myHeight)
+        self.resize(self.myWidth, self.myHeight)
         self.layout = _qt.QHBoxLayout()
         self.setLayout(self.layout)
 

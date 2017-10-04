@@ -11,14 +11,13 @@ class BaseConnection(_qt.QGraphicsPathItem):
 
     def __init__(self, *args, **kwargs):
         super(BaseConnection, self).__init__(*args, **kwargs)
-        self.setZValue(-3)
+        self.setFlag(_qt.QGraphicsItem.ItemStacksBehindParent)
+        # self.setFlag(_qt.QGraphicsItem.ItemNegativeZStacksBehindParent)
+        # self.setZValue(-3)
         self.stroker = _qt.QPainterPathStroker()
         self.stroker.setWidth(5)
         self.stroker.setCapStyle(_qtcore.Qt.RoundCap)
         self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
-        self.gradient = _qt.QLinearGradient()
-        self.gradient.setColorAt(0, _qt.QColor(53, 53, 53))
-        self.gradient.setColorAt(1, _qt.QColor(93, 93, 93))
         self.flat_brush = _qt.QBrush(_qt.QColor(73, 73, 73))
 
     def compute_path(self):
@@ -61,15 +60,9 @@ class BaseConnection(_qt.QGraphicsPathItem):
 
         self.setPath(stroker.createStroke(path))
 
-    def update_gradient(self):
-        """Compute the brush gradient of the connection."""
-        self.gradient.setStart(self.source_pos)
-        self.gradient.setFinalStop(self.destination_pos)
-
     def paint(self, painter, option, widget):
         """Draw a path between the source and destination `Attribute`."""
         self.compute_path()
-        # self.update_gradient()
         super(BaseConnection, self).paint(painter, option, widget)
         painter.fillPath(self.path(), self.flat_brush)
 
@@ -116,6 +109,9 @@ class Connection(BaseConnection):
         self.destination = destination
         source.connections[str(destination)] = self
         destination.connections[str(source)] = self
+        self._about_to_disconnect = False
+        self._disconnect_from = None
+        self._disconnect_attach = None
 
     def compute_path(self):
         """Update the path of this connection.
@@ -132,3 +128,35 @@ class Connection(BaseConnection):
                 self.destination.boundingRect().center(),
             )
         super(Connection, self).compute_path()
+
+    def mousePressEvent(self, event):
+        if event.button() != _qtcore.Qt.MouseButton.LeftButton:
+            return
+
+        self._about_to_disconnect = True
+
+        # Find out from which plug we want to disconnect.
+        drag_pos = event.pos()
+        from_source = drag_pos - self.source_pos
+        from_destination = self.destination_pos - drag_pos
+
+        if from_source.manhattanLength() >= from_destination.manhattanLength():
+            self._disconnect_from = self.destination
+            self._disconnect_attach = self.source
+        else:
+            self._disconnect_from = self.source
+            self._disconnect_attach = self.destination
+
+    def mouseMoveEvent(self, event):
+        if not self._about_to_disconnect:
+            return
+        if not self._disconnect_from:
+            return
+        if str(self._disconnect_attach) in self._disconnect_from.connections:
+            self._disconnect_from.remove_connection(str(self._disconnect_attach))
+        self._disconnect_from.create_pending_connection(self._disconnect_attach)
+
+    def mouseReleaseEvent(self, event):
+        self._about_to_disconnect = False
+        self._disconnect_from = None
+        self._disconnect_attach = None
