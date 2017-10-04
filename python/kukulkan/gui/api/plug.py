@@ -154,12 +154,14 @@ class Plug(_qt.QGraphicsItem):
         :param str key: Name of the connection to remove.
         """
         conn = self.connections.pop(key)
-        conn.source.connections.pop(str(conn.destination), None)
-        conn.destination.connections.pop(str(conn.source), None)
+        source = conn.source
+        destination = conn.destination
+        source.connections.pop(str(destination), None)
+        destination.connections.pop(str(source), None)
         if conn in self.scene().items():
             self.scene().removeItem(conn)
-        self.on_disconnection(other)
-        other.on_disconnection(self)
+        source.on_disconnection(destination)
+        destination.on_disconnection(source)
 
     def disconnect(self, other):
         """Remove the connection between this `Plug` and ``other``
