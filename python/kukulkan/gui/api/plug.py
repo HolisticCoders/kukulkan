@@ -159,19 +159,43 @@ class Plug(_qt.QGraphicsItem):
         if conn in self.scene().items():
             self.scene().removeItem(conn)
 
-    def connect(self, to):
+    def disconnect(self, other):
+        """Remove the connection between this `Plug` and ``other``
+
+        :param other: `Plug` to connect to.
+        :type other: Plug
+        """
+        # Find a common connection
+        other_connections = other.connections.values()
+        for key, conn in self.connections.iteritems():
+            if conn not in other_connections:
+                continue
+            conn.source.connections.pop(str(conn.destination), None)
+            conn.destination.connections.pop(str(conn.source), None)
+            if conn in self.scene().items():
+                self.scene().removeItem(conn)
+            self.on_disconnection(other)
+            other.on_disconnection(self)
+            return
+
+    def connect(self, other):
         """Create a connection between this plug and another one.
+
+        :param other: `Plug` to connect to.
+        :type other: Plug
+        :return: The resulting connection.
+        :rtype: Connection
         """
         if self.plug_type == 'input':
-            source = to
+            source = other
             destination = self
         elif self.plug_type == 'output':
             source = self
-            destination = to
+            destination = other
         if not self._validate_connection(source, destination):
             return
-        conn = _conn.Connection(source, destination)
-        conn.setParentItem(source)
+        return _conn.Connection(source, destination)
+
     def on_connection(self, other):
         """Method called when this `Plug` gets connected.
 
