@@ -1,21 +1,22 @@
-import kukulkan.gui.api.attribute as _attribute
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
 
-class AttributeType(_qt.QWidget):
+
+class AttributeWidget(_qt.QWidget):
     def __init__(self, name, node, parent_item, *args, **kwargs):
-        super(AttributeType, self).__init__(*args, **kwargs)
+        super(AttributeWidget, self).__init__(*args, **kwargs)
         self.name = name
         self.node = node
         self.parent_item = parent_item
+        self.widget = None
         self.reset()
         self.create_widget()
         if self.widget:
             self.left_layout.addWidget(self.widget)
-        if isinstance(self.parent_item, _attribute.Input):
+        if self.parent_item.is_input:
             self.left_layout.addWidget(self.widget)
             self.right_layout.addWidget(self.label)
-        else:
+        elif self.parent_item.is_output:
             self.left_layout.addWidget(self.label)
             self.right_layout.addWidget(self.widget)
 
@@ -23,7 +24,7 @@ class AttributeType(_qt.QWidget):
         self.myWidth = self.node.width - self.parent_item.size
         self.myHeight = 50
         self.setStyleSheet("background-color: transparent")
-        self.resize(self.myWidth , self.myHeight)
+        self.resize(self.myWidth, self.myHeight)
         self.layout = _qt.QHBoxLayout()
         self.setLayout(self.layout)
 
@@ -48,17 +49,18 @@ class AttributeType(_qt.QWidget):
         """
 
 
-class Message(AttributeType):
+class Message(AttributeWidget):
     """Simple attribute that is used to connect nodes."""
 
 
-class Numeric(AttributeType):
+class Numeric(AttributeWidget):
     """Base class for numeric attributes."""
 
 
 class Float(Numeric):
     """Float attribute."""
     def create_widget(self):
+        """Create a QDoubleSpinBox."""
         super(Float, self).create_widget()
         self.widget = _qt.QDoubleSpinBox()
 
@@ -66,30 +68,39 @@ class Float(Numeric):
 class Integer(Numeric):
     """Int attribute."""
     def create_widget(self):
+        """Create a QSpinBox."""
         super(Integer, self).create_widget()
         self.widget = _qt.QSpinBox()
 
 
-class Boolean(AttributeType):
+class Boolean(AttributeWidget):
     """Bool attribute."""
     def create_widget(self):
+        """Create a QCheckBox."""
         super(Boolean, self).create_widget()
         self.widget = _qt.QCheckBox()
 
 
-class String(AttributeType):
+class String(AttributeWidget):
     """String attribute."""
     def create_widget(self):
+        """Create a QLineEdit."""
         super(String, self).create_widget()
         self.widget = _qt.QLineEdit()
 
 
-class Enum(AttributeType):
+class Enum(AttributeWidget):
     """Enum attribute."""
     def create_widget(self):
+        """Create a QComboBox."""
         super(Enum, self).create_widget()
         self.widget = _qt.QComboBox()
 
-
-class Color(AttributeType):
-    """Color attribute."""
+map_widgets = {
+    'message': Message,
+    'integer': Integer,
+    'float': Float,
+    'boolean': Boolean,
+    'string': String,
+    'enum': Enum,
+}
