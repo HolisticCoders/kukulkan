@@ -1,3 +1,5 @@
+from functools import partial
+
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
 
@@ -7,6 +9,7 @@ class AttributeWidget(_qt.QWidget):
         super(AttributeWidget, self).__init__(*args, **kwargs)
         self.name = name
         self.node = node
+        self.value = None
         self.parent_item = parent_item
         self.widget = None
         self.reset()
@@ -39,14 +42,19 @@ class AttributeWidget(_qt.QWidget):
         self.right_layout.addWidget(self.label)
 
     def create_widget(self):
-        """Create the widget of this attribute.
+        """Create the widget of this widget.
 
         Override when subclassing to add a widget to the attribute.
         You want to set the variable self.widget like so:
-            self.widget = self.scene().addWidget(_qt.QDoubleSpinBox())
-        This is also the place to set the label_offset and anything that
-        is affected by the presence of the widget.
+            self.widget = _qt.QSpinBox()
         """
+
+    def update_value(self, value):
+        """Update the value of this container widget.
+
+        This method should be called by a signal of the contained widget.
+        """
+        self.value = value
 
 
 class Message(AttributeWidget):
@@ -57,20 +65,22 @@ class Numeric(AttributeWidget):
     """Base class for numeric attributes."""
 
 
-class Float(Numeric):
-    """Float attribute."""
-    def create_widget(self):
-        """Create a QDoubleSpinBox."""
-        super(Float, self).create_widget()
-        self.widget = _qt.QDoubleSpinBox()
-
-
 class Integer(Numeric):
     """Int attribute."""
     def create_widget(self):
         """Create a QSpinBox."""
         super(Integer, self).create_widget()
         self.widget = _qt.QSpinBox()
+        self.widget.valueChanged.connect(self.update_value)
+
+
+class Float(Numeric):
+    """Float attribute."""
+    def create_widget(self):
+        """Create a QDoubleSpinBox."""
+        super(Float, self).create_widget()
+        self.widget = _qt.QDoubleSpinBox()
+        self.widget.valueChanged.connect(self.update_value)
 
 
 class Boolean(AttributeWidget):
@@ -79,6 +89,7 @@ class Boolean(AttributeWidget):
         """Create a QCheckBox."""
         super(Boolean, self).create_widget()
         self.widget = _qt.QCheckBox()
+        self.widget.stateChanged.connect(self.update_value)
 
 
 class String(AttributeWidget):
@@ -87,6 +98,10 @@ class String(AttributeWidget):
         """Create a QLineEdit."""
         super(String, self).create_widget()
         self.widget = _qt.QLineEdit()
+        self.widget.editingFinished.connect(self.update_value)
+
+    def update_value(self):
+        self.value = self.widget.text()
 
 
 class Enum(AttributeWidget):
@@ -95,6 +110,8 @@ class Enum(AttributeWidget):
         """Create a QComboBox."""
         super(Enum, self).create_widget()
         self.widget = _qt.QComboBox()
+
+        self.widget.currentIndexChanged.connect(self.update_value)
 
 map_widgets = {
     'message': Message,
