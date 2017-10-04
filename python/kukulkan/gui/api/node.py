@@ -38,6 +38,11 @@ class Node(_qt.QGraphicsItem):
         self.width = 200
 
         self.roundness = 5
+        self.highlight_color = _qt.QColor(255, 255, 155)
+        self.highlight_padding = 3
+        self.highlighter = _qt.QPainterPathStroker()
+        self.highlighter.setWidth(self.highlight_padding * 2)
+        self.highlighter.setCapStyle(_qtcore.Qt.RoundCap)
         self.body_color = _qt.QColor(110, 110, 110)
         self.label_color = _qt.QColor(50, 50, 50)
         self.label_font = _qt.QFont(
@@ -78,17 +83,36 @@ class Node(_qt.QGraphicsItem):
 
     def boundingRect(self):
         return _qtcore.QRectF(
-            self.x,
-            self.y,
-            self.width,
-            self.height,
+            self.x - self.highlight_padding,
+            self.y - self.highlight_padding,
+            self.width + self.highlight_padding * 2,
+            self.height + self.highlight_padding * 2,
         )
 
     def paint(self, painter, option, widget):
+        if self.isSelected():
+            self.paint_highlight(painter, option, widget)
         self.paint_clip(painter, option, widget)
         self.paint_label(painter, option, widget)
         self.paint_body(painter, option, widget)
         self.paint_label_text(painter, option, widget)
+
+    def paint_highlight(self, painter, option, widget):
+        """Highlight the node.
+
+        Called when the node is selected.
+        """
+        path = _qt.QPainterPath()
+        path.addRoundedRect(
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            self.roundness,
+            self.roundness,
+        )
+        outline = self.highlighter.createStroke(path)
+        painter.fillPath(outline, _qt.QBrush(self.highlight_color))
 
     def paint_clip(self, painter, option, widget):
         # Clip the node to make it round.
