@@ -154,10 +154,15 @@ class Plug(_qt.QGraphicsItem):
         :param str key: Name of the connection to remove.
         """
         conn = self.connections.pop(key)
-        conn.source.connections.pop(str(conn.destination), None)
-        conn.destination.connections.pop(str(conn.source), None)
+        source = conn.source
+        destination = conn.destination
+        source.connections.pop(str(destination), None)
+        destination.connections.pop(str(source), None)
         if conn in self.scene().items():
             self.scene().removeItem(conn)
+        source.on_disconnection(destination)
+        destination.on_disconnection(source)
+
 
     def disconnect(self, other):
         """Remove the connection between this `Plug` and ``other``
@@ -259,6 +264,22 @@ class Input(Plug):
     """An input `Plug`."""
     plug_type = 'input'
 
+    def on_connection(self, other):
+        """Update the value of the attribute and lock its widget.
+
+        :param other: Other `Plug` connected to this one.
+        :type other: Plug
+        """
+        self.attribute.value = other.attribute.value
+        self.attribute.lock_widget()
+
+    def on_disconnection(self, other):
+        """Unlock the widget of the attribute
+
+        :param other: Other `Plug` disconnected from this one.
+        :type other: Plug
+        """
+        self.attribute.unlock_widget()
 
 class Output(Plug):
     """An output `Plug`."""
