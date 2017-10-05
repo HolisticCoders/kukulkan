@@ -1,3 +1,5 @@
+import kukulkan.events
+from kukulkan.config import UI
 
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
@@ -28,6 +30,8 @@ class GraphView(_qt.QGraphicsView):
         self.setVerticalScrollBarPolicy(_qtcore.Qt.ScrollBarAlwaysOff)
         self.setTransformationAnchor(_qt.QGraphicsView.AnchorUnderMouse)
         self.setViewportUpdateMode(_qt.QGraphicsView.FullViewportUpdate)
+        kukulkan.events.subscribe(self.refresh, 'config.ui.changed')
+
     def pan_event(self, event):
         """Pan the view.
 
@@ -86,6 +90,32 @@ class GraphView(_qt.QGraphicsView):
         elif event.delta() < 0:
             scale -= self.zooming_speed_wheel
         self.scale(scale, scale)
+
+    def drawBackground(self, painter, rect):
+        painter.setBrush(_qt.QColor(*UI.graph.brush))
+        painter.setPen(_qt.QColor(*UI.graph.grid.pen))
+        top = rect.top()
+        bottom = rect.bottom()
+        left = rect.left()
+        right = rect.right()
+
+        lines = []
+
+        currentXPos = left
+        while currentXPos <= right:
+            line = _qtcore.QLine(currentXPos, top, currentXPos, bottom)
+            lines.append(line)
+            currentXPos += UI.graph.grid.step
+
+        currentYPos = top
+        while currentYPos <= bottom:
+            line = _qtcore.QLine(left, currentYPos, right, currentYPos)
+            lines.append(line)
+            currentYPos += UI.graph.grid.step
+
+        painter.drawRect(rect)
+        painter.drawLines(lines)
+
     def refresh(self):
         """Force the update of this view."""
         self.scene().update(self.viewport().rect())
