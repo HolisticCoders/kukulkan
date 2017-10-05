@@ -37,7 +37,11 @@ class Attribute(_qt.QGraphicsItem):
 
     @property
     def value(self):
-        return self.base_widget.value
+        return self.base_widget.widget().value
+
+    @value.setter
+    def value(self, value):
+        self.base_widget.widget().value = value
 
     def reset(self):
         """Reset the graphic state to its initial value."""
@@ -67,7 +71,14 @@ class Attribute(_qt.QGraphicsItem):
             self.widget_x,
             self.y + widget_offset
         )
+    
+    def lock_widget(self):
+        if self.base_widget.widget().widget:
+            self.base_widget.widget().widget.setEnabled(False)
 
+    def unlock_widget(self):
+        if self.base_widget.widget().widget:
+            self.base_widget.widget().widget.setEnabled(True)
 
     def paint(self, painter, option, widget):
         pass

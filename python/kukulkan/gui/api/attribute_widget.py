@@ -9,12 +9,13 @@ class AttributeWidget(_qt.QWidget):
         super(AttributeWidget, self).__init__(*args, **kwargs)
         self.name = name
         self.node = node
-        self.value = None
+        self._value = None
         self.parent_item = parent_item
         self.widget = None
         self.reset()
         self.create_widget()
         if self.widget:
+            self.update_value()
             self.left_layout.addWidget(self.widget)
         if self.parent_item.is_input:
             self.left_layout.addWidget(self.widget)
@@ -41,6 +42,15 @@ class AttributeWidget(_qt.QWidget):
         self.label = _qt.QLabel(self.name)
         self.right_layout.addWidget(self.label)
 
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+        self.update_widget_value(value)
+
     def create_widget(self):
         """Create the widget of this widget.
 
@@ -49,12 +59,18 @@ class AttributeWidget(_qt.QWidget):
             self.widget = _qt.QSpinBox()
         """
 
-    def update_value(self, value):
+    def update_value(self):
         """Update the value of this container widget.
 
         This method should be called by a signal of the contained widget.
+        It should also be override in the subclasses.
         """
-        self.value = value
+
+    def update_widget_value(self, value):
+        """Update the value of this contained widget.
+
+        override this method in the subclasses
+        """
 
 
 class Message(AttributeWidget):
@@ -63,6 +79,13 @@ class Message(AttributeWidget):
 
 class Numeric(AttributeWidget):
     """Base class for numeric attributes."""
+    def update_value(self):
+        super(Numeric, self).update_value()
+        self.value = self.widget.value()
+
+    def update_widget_value(self, value):
+        super(Numeric, self).update_widget_value(value)
+        self.widget.setValue(value)
 
 
 class Integer(Numeric):
@@ -89,7 +112,16 @@ class Boolean(AttributeWidget):
         """Create a QCheckBox."""
         super(Boolean, self).create_widget()
         self.widget = _qt.QCheckBox()
+        self.widget.setTristate(False)
         self.widget.stateChanged.connect(self.update_value)
+
+    def update_value(self):
+        super(Boolean, self).update_value()
+        self.value = self.widget.isChecked()
+
+    def update_widget_value(self, value):
+        super(Boolean, self).update_widget_value(value)
+        self.widget.setChecked(value)
 
 
 class String(AttributeWidget):
@@ -101,7 +133,12 @@ class String(AttributeWidget):
         self.widget.editingFinished.connect(self.update_value)
 
     def update_value(self):
+        super(String, self).update_value()
         self.value = self.widget.text()
+
+    def update_widget_value(self, value):
+        super(String, self).update_widget_value(value)
+        self.widget.setText(value)
 
 
 class Enum(AttributeWidget):
@@ -110,8 +147,15 @@ class Enum(AttributeWidget):
         """Create a QComboBox."""
         super(Enum, self).create_widget()
         self.widget = _qt.QComboBox()
-
         self.widget.currentIndexChanged.connect(self.update_value)
+
+    def update_value(self):
+        super(Enum, self).update_value()
+        self.value = self.widget.currentIndex()
+
+    def update_widget_value(self, value):
+        super(Enum, self).update_widget_value(value)
+        self.widget.setCurrentIndex(value)
 
 map_widgets = {
     'message': Message,
