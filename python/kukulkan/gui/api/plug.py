@@ -1,3 +1,5 @@
+from kukulkan.config import UI
+
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
 import kukulkan.gui.api.connection as _conn
@@ -41,9 +43,6 @@ class Plug(_qt.QGraphicsItem):
         """Reset the graphic state to its initial value."""
         self.x = 0
         self.y = 0
-        self.inner_color = _qt.QColor(53, 53, 53)
-        self.background = _qt.QBrush(_qt.QColor(200, 180, 150))
-        self.outline = _qt.QPen(_qt.QColor(23, 23, 23))
 
     @property
     def node(self):
@@ -67,18 +66,22 @@ class Plug(_qt.QGraphicsItem):
         return _qtcore.QRectF(
             self.x,
             self.y,
-            self.attribute.size,
-            self.attribute.size,
+            UI.plug.size,
+            UI.plug.size,
         )
 
     def paint(self, painter, option, widget):
-        painter.setBrush(self.background)
-        painter.setPen(self.outline)
+        painter.setBrush(_qt.QColor(*UI.plug.brush))
+        pen = _qt.QPen(
+            _qt.QBrush(_qt.QColor(*UI.plug.pen.brush)),
+            UI.plug.pen.width
+        )
+        painter.setPen(_qtcore.Qt.NoPen)
         painter.drawEllipse(
             self.x,
             self.y,
-            self.attribute.size,
-            self.attribute.size,
+            UI.plug.size,
+            UI.plug.size,
         )
 
     def mousePressEvent(self, event):

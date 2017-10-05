@@ -1,3 +1,5 @@
+from kukulkan.config import UI
+
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
 import kukulkan.gui.api.attribute as _attribute
@@ -17,6 +19,14 @@ class Node(_qt.QGraphicsItem):
         """Return the string form of the node (its name)."""
         return str(self.name)
 
+    def __getattr__(self, name):
+        try:
+            attr = getattr(UI.node, name)
+            return attr
+        except AttributeError:
+            err = 'Node object has no attribute {}.'.format(name)
+            raise AttributeError(err)
+
     @property
     def connections(self):
         """Return the connections of this `Node`."""
@@ -33,29 +43,30 @@ class Node(_qt.QGraphicsItem):
         self.setFlag(_qt.QGraphicsItem.ItemIsSelectable)
         self.setFlag(_qt.QGraphicsItem.ItemIsFocusable)
 
+        self.resizing = False
+
         self.x = 0
         self.y = 0
-        self.width = 200
 
-        self.roundness = 5
-        self.highlight_color = _qt.QColor(255, 255, 155)
-        self.highlight_padding = 3
         self.highlighter = _qt.QPainterPathStroker()
-        self.highlighter.setWidth(self.highlight_padding * 2)
         self.highlighter.setCapStyle(_qtcore.Qt.RoundCap)
-        self.body_color = _qt.QColor(110, 110, 110)
-        self.label_color = _qt.QColor(50, 50, 50)
-        self.label_font = _qt.QFont(
-            'Helvetica [Cronyx]',
-            12,
-            _qt.QFont.Bold
+        self.resize_handle_size = 10
+
+    @property
+    def base_height(self):
+        return (
+            UI.node.header.height
+            + UI.attribute.spacing
+            + self.resize_handle_size
         )
-        self.label_height = 30
-        self.label_offset = 5
 
-        self.attributes_spacing = 20
-
-        self.height = self.label_height + self.attributes_spacing
+    @property
+    def height(self):
+        return (
+            self.base_height
+            + UI.attribute.spacing * len(self.attributes)
+            + UI.attribute.size * (len(self.attributes) - 1)
+        )
 
     def add_attribute(self, name, attribute_type, plug_type):
         if name in self.attributes:
@@ -71,11 +82,10 @@ class Node(_qt.QGraphicsItem):
         attribute = attribute(name, self, attribute_type)
         attribute.setParentItem(self)
         self.attributes[name] = attribute
-        self.height += self.attributes_spacing + attribute.size
         attr_x = attribute.size * -0.5
         attr_y = (
-            self.label_height
-            + self.attributes_spacing * len(self.attributes)
+            UI.node.header.height
+            + UI.attribute.spacing * len(self.attributes)
             + attribute.size * (len(self.attributes) - 1)
         )
         attribute.setPos(attr_x, attr_y)
@@ -83,18 +93,19 @@ class Node(_qt.QGraphicsItem):
 
     def boundingRect(self):
         return _qtcore.QRectF(
-            self.x - self.highlight_padding,
-            self.y - self.highlight_padding,
-            self.width + self.highlight_padding * 2,
-            self.height + self.highlight_padding * 2,
+            self.x - UI.node.highlight.padding,
+            self.y - UI.node.highlight.padding,
+            UI.node.width + UI.node.highlight.padding * 2,
+            self.height + UI.node.highlight.padding * 2,
         )
 
     def paint(self, painter, option, widget):
         if self.isSelected():
             self.paint_highlight(painter, option, widget)
         self.paint_clip(painter, option, widget)
-        self.paint_label(painter, option, widget)
         self.paint_body(painter, option, widget)
+        self.paint_label(painter, option, widget)
+        # self.paint_resize_handle(painter, option, widget)
         self.paint_label_text(painter, option, widget)
 
     def paint_highlight(self, painter, option, widget):
@@ -106,13 +117,15 @@ class Node(_qt.QGraphicsItem):
         path.addRoundedRect(
             self.x,
             self.y,
-            self.width,
+            UI.node.width,
             self.height,
-            self.roundness,
-            self.roundness,
+            UI.node.roundness,
+            UI.node.roundness,
         )
+        self.highlighter.setWidth(UI.node.highlight.padding * 2)
         outline = self.highlighter.createStroke(path)
-        painter.fillPath(outline, _qt.QBrush(self.highlight_color))
+        color = _qt.QColor(*UI.node.highlight.brush)
+        painter.fillPath(outline, _qt.QBrush(color))
 
     def paint_clip(self, painter, option, widget):
         # Clip the node to make it round.
@@ -120,10 +133,10 @@ class Node(_qt.QGraphicsItem):
         clip.addRoundedRect(
             self.x,
             self.y,
-            self.width,
+            UI.node.width,
             self.height,
-            self.roundness,
-            self.roundness,
+            UI.node.roundness,
+            UI.node.roundness,
         )
         painter.setClipping(True)
         painter.setClipPath(clip)
@@ -132,39 +145,94 @@ class Node(_qt.QGraphicsItem):
 
     def paint_label(self, painter, option, widget):
         # Paint the label part.
-        painter.setBrush(_qt.QBrush(self.label_color))
+        painter.setBrush(_qt.QBrush(_qt.QColor(*UI.node.header.brush)))
         painter.drawRect(
             self.x,
             self.y,
-            self.width,
-            self.label_height,
+            UI.node.width,
+            UI.node.header.height,
         )
 
     def paint_body(self, painter, option, widget):
         # Paint the body part.
-        painter.setBrush(_qt.QBrush(self.body_color))
+        painter.setBrush(_qt.QBrush(_qt.QColor(*UI.node.body.brush)))
         painter.drawRect(
             self.x,
-            self.y + self.label_height,
-            self.width,
-            self.height - self.label_height,
+            self.y + UI.node.header.height,
+            UI.node.width,
+            self.height - UI.node.header.height,
         )
 
     def paint_label_text(self, painter, option, widget):
         # Paint the label text
-        painter.setFont(self.label_font)
-        painter.setPen(self.body_color)
+        font = _qt.QFont(
+            UI.node.label.font.family,
+            UI.node.label.font.size,
+            UI.node.label.font.weight,
+        )
+        painter.setFont(font)
+        painter.setPen(_qt.QColor(*UI.node.label.pen))
         painter.drawText(
-            self.x + self.label_offset,
+            self.x + UI.node.label.offset,
             self.y,
-            self.width - self.label_offset,
-            self.label_height,
+            UI.node.width - UI.node.label.offset,
+            UI.node.header.height,
             _qtcore.Qt.AlignVCenter | _qtcore.Qt.AlignLeft,
             self.name,
         )
 
-    def mouseMoveEvent(self, event):
-        super(Node, self).mouseMoveEvent(event)
-        for attribute in self.attributes.values():
-            for connection in attribute.connections.values():
-                connection.compute_path()
+    def paint_resize_handle(self, painter, option, widget):
+        """Paint the footer region of the node.
+        """
+        painter.setBrush(_qt.QBrush(_qt.QColor(*UI['header']['brush'])))
+        painter.drawRect(
+            self.x,
+            self.y + self.height - self.resize_handle_size,
+            UI.node.width,
+            self.resize_handle_size,
+        )
+
+    # def resize_handle_clicked(self, event):
+    #     """Return `True` if the resize handle was clicked.
+    #
+    #     :rtype: bool
+    #     """
+    #     height_start = self.y + self.height - self.resize_handle_size
+    #     height_end = self.y + self.height
+    #     cond_height = height_start <= event.pos().y() <= height_end
+    #     if not cond_height:
+    #         return False
+    #     width_start = self.x + UI.node.width - self.resize_handle_size
+    #     width_end = self.x + UI.node.width
+    #     cond_width = width_start <= event.pos().x() <= width_end
+    #     if not cond_width:
+    #         return False
+    #     return True
+    #
+    # def resize_event(self, event):
+    #     """Resize this node by the resize handle."""
+    #     offset = event.pos() - self.resize_pos
+    #     UI.node.width += offset.x()
+    #     self.resize_pos = event.pos()
+    #
+    # def mousePressEvent(self, event):
+    #     super(Node, self).mousePressEvent(event)
+    #     if self.resize_handle_clicked(event):
+    #         self.resize_pos = event.pos()
+    #         self.resizing = True
+    #
+    # def mouseMoveEvent(self, event):
+    #     if self.resizing:
+    #         self.resize_event(event)
+    #     else:
+    #         super(Node, self).mouseMoveEvent(event)
+    #
+    # def mouseReleaseEvent(self, event):
+    #     super(Node, self).mouseReleaseEvent(event)
+    #     self.resizing = False
+
+    # def mouseMoveEvent(self, event):
+    #     super(Node, self).mouseMoveEvent(event)
+    #     for attribute in self.attributes.values():
+    #         for connection in attribute.connections.values():
+    #             connection.compute_path()

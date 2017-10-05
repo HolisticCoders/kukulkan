@@ -1,3 +1,5 @@
+from kukulkan.config import UI
+
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
 
@@ -12,11 +14,7 @@ class BaseConnection(_qt.QGraphicsPathItem):
     def __init__(self, *args, **kwargs):
         super(BaseConnection, self).__init__(*args, **kwargs)
         self.setFlag(_qt.QGraphicsItem.ItemStacksBehindParent)
-        self.stroker = _qt.QPainterPathStroker()
-        self.stroker.setWidth(5)
-        self.stroker.setCapStyle(_qtcore.Qt.RoundCap)
         self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
-        self.flat_brush = _qt.QBrush(_qt.QColor(73, 73, 73))
 
     def compute_path(self):
         """Compute the path of this connection.
@@ -53,7 +51,7 @@ class BaseConnection(_qt.QGraphicsPathItem):
         )
 
         stroker = _qt.QPainterPathStroker()
-        stroker.setWidth(5)
+        stroker.setWidth(UI.connection.thickness)
         stroker.setCapStyle(_qtcore.Qt.RoundCap)
 
         self.setPath(stroker.createStroke(path))
@@ -62,7 +60,8 @@ class BaseConnection(_qt.QGraphicsPathItem):
         """Draw a path between the source and destination `Attribute`."""
         self.compute_path()
         super(BaseConnection, self).paint(painter, option, widget)
-        painter.fillPath(self.path(), self.flat_brush)
+        brush = _qt.QBrush(_qt.QColor(*UI.connection.brush))
+        painter.fillPath(self.path(), brush)
 
 
 class PendingConnection(BaseConnection):

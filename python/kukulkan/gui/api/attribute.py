@@ -1,3 +1,5 @@
+from kukulkan.config import UI
+
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
 import kukulkan.gui.api.plug as _plug
@@ -26,7 +28,7 @@ class Attribute(_qt.QGraphicsItem):
         return '.'.join(map(str, [self.node, self.name]))
 
     @property
-    def connections(self): 
+    def connections(self):
         """Return the connections of this `Attribute`."""
         connections = {}
         if self.plug is not None:
@@ -41,9 +43,9 @@ class Attribute(_qt.QGraphicsItem):
         """Reset the graphic state to its initial value."""
         self.x = 0
         self.y = 0
-        self.size = 15
+        self.size = UI.attribute.size
         self.width = self.node.width + self.size
-        self.widget_x = self.x + self.size 
+        self.widget_x = self.x + self.size
 
 
     def boundingRect(self):
