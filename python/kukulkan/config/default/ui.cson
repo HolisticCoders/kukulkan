@@ -1,0 +1,78 @@
+graph:
+    brush: [
+        67
+        78
+        88
+    ]
+    grid:
+        step: 50
+        pen: [
+            110
+            110
+            110
+        ]
+node:
+    body:
+        brush: [
+            53
+            53
+            53
+        ]
+    width: 200
+    roundness: 6
+    highlight:
+        padding: 3
+        brush: [
+            255
+            240
+            100
+        ]
+    footer:
+        brush: [
+            50
+            50
+            50
+        ]
+        height: 15
+    header:
+        brush: [
+            33
+            33
+            33
+        ]
+        height: 30
+    label:
+        pen: [
+            83
+            83
+            83
+        ]
+        font:
+            family: 'Helvetica [Cronyx]'
+            size: 11
+            weight: 75
+        offset: 15
+attribute:
+    size: 15
+    spacing: 20
+plug:
+    size: 17
+    brush: [
+        255
+        225
+        150
+    ]
+    pen:
+        width: 0
+        brush: [
+            150
+            150
+            150
+        ]
+connection:
+    thickness: 5
+    brush: [
+        73
+        73
+        73
+    ]
