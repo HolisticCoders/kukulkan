@@ -10,7 +10,7 @@ class GraphWindow(_qt.QMainWindow):
         self.build()
 
     def build(self):
-        self.view = _qt.QGraphicsView()
+        self.view = _graph.GraphView()
         self.scene = _graph.Graph()
         self.view.setScene(self.scene)
         self.view.setRenderHints(_qt.QPainter.Antialiasing)
