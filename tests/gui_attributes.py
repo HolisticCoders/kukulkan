@@ -19,57 +19,47 @@ def main():
     window = kukulkan.gui.api.window.GraphWindow()
 
 
-    node1 = window.scene.add_node('node1')
-    node1.add_attribute(
+    node2 = window.scene.add_node('Node2')
+    node2.add_attribute(
         name='Integer',
         attribute_type='integer',
         plug_type='input'
     )
-    node1.add_attribute(
+    node2.add_attribute(
         name='Float',
         attribute_type='float',
         plug_type='input'
     )
-    node1.add_attribute(
+    node2.add_attribute(
         name='Boolean',
         attribute_type='boolean',
         plug_type='input'
     )
-    node1.add_attribute(
+    node2.add_attribute(
         name='String',
         attribute_type='string',
-        plug_type='input'
-    )
-    node1.add_attribute(
-        name='Enum',
-        attribute_type='enum',
         plug_type='input'
     )
 
-    node2 = window.scene.add_node('node2')
-    node2.add_attribute(
+    node1 = window.scene.add_node('Node1')
+    node1.add_attribute(
         name='Integer',
         attribute_type='integer',
         plug_type='output'
     )
-    node2.add_attribute(
+    node1.add_attribute(
         name='Float',
         attribute_type='float',
         plug_type='output'
     )
-    node2.add_attribute(
+    node1.add_attribute(
         name='Boolean',
         attribute_type='boolean',
         plug_type='output'
     )
-    node2.add_attribute(
+    node1.add_attribute(
         name='String',
         attribute_type='string',
-        plug_type='output'
-    )
-    node2.add_attribute(
-        name='Enum',
-        attribute_type='enum',
         plug_type='output'
     )
 
