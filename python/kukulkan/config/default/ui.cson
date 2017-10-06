@@ -1,15 +1,15 @@
 graph:
     brush: [
-        67
-        78
-        88
+        29
+        31
+        33
     ]
     grid:
         step: 50
         pen: [
-            110
-            110
-            110
+            40
+            42
+            46
         ]
 node:
     body:
