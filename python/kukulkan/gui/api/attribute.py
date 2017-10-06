@@ -14,6 +14,8 @@ class Attribute(_qt.QGraphicsItem):
         self.node = node
         self.plug = None
         self.type = attribute_type
+        self._value = None
+        self.base_widget = None
 
         self.is_input = False
         self.is_output = False
@@ -37,11 +39,17 @@ class Attribute(_qt.QGraphicsItem):
 
     @property
     def value(self):
-        return self.base_widget.widget().value
+        return self._value
 
     @value.setter
     def value(self, value):
-        self.base_widget.widget().value = value
+        self._value = value
+        if self.base_widget:
+            if self.base_widget.widget().value != value:
+                self.base_widget.widget().value = value
+        if self.is_output:
+            for name, conn in self.connections.iteritems():
+                conn.destination.attribute.value = value
 
     def reset(self):
         """Reset the graphic state to its initial value."""

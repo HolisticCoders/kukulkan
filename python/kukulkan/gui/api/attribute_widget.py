@@ -5,27 +5,27 @@ import kukulkan.gui.qt.QtCore as _qtcore
 
 
 class AttributeWidget(_qt.QWidget):
-    def __init__(self, name, node, parent_item, *args, **kwargs):
+    def __init__(self, name, node, attribute, *args, **kwargs):
         super(AttributeWidget, self).__init__(*args, **kwargs)
         self.name = name
         self.node = node
         self._value = None
-        self.parent_item = parent_item
+        self.attribute = attribute
         self.widget = None
         self.reset()
         self.create_widget()
         if self.widget:
-            self.update_value()
+            self.update_value_from_widget()
             self.left_layout.addWidget(self.widget)
-        if self.parent_item.is_input:
+        if self.attribute.is_input:
             self.left_layout.addWidget(self.widget)
             self.right_layout.addWidget(self.label)
-        elif self.parent_item.is_output:
+        elif self.attribute.is_output:
             self.left_layout.addWidget(self.label)
             self.right_layout.addWidget(self.widget)
 
     def reset(self):
-        self.myWidth = self.node.width - self.parent_item.size
+        self.myWidth = self.node.width - self.attribute.size
         self.myHeight = 50
         self.setStyleSheet("background-color: transparent")
         self.resize(self.myWidth, self.myHeight)
@@ -49,7 +49,10 @@ class AttributeWidget(_qt.QWidget):
     @value.setter
     def value(self, value):
         self._value = value
+        print value
         self.update_widget_value(value)
+        if self.attribute.value != value:
+            self.attribute.value = value
 
     def create_widget(self):
         """Create the widget of this widget.
@@ -59,7 +62,7 @@ class AttributeWidget(_qt.QWidget):
             self.widget = _qt.QSpinBox()
         """
 
-    def update_value(self):
+    def update_value_from_widget(self):
         """Update the value of this container widget.
 
         This method should be called by a signal of the contained widget.
@@ -79,8 +82,8 @@ class Message(AttributeWidget):
 
 class Numeric(AttributeWidget):
     """Base class for numeric attributes."""
-    def update_value(self):
-        super(Numeric, self).update_value()
+    def update_value_from_widget(self):
+        super(Numeric, self).update_value_from_widget()
         self.value = self.widget.value()
 
     def update_widget_value(self, value):
@@ -94,7 +97,7 @@ class Integer(Numeric):
         """Create a QSpinBox."""
         super(Integer, self).create_widget()
         self.widget = _qt.QSpinBox()
-        self.widget.valueChanged.connect(self.update_value)
+        self.widget.valueChanged.connect(self.update_value_from_widget)
 
 
 class Float(Numeric):
@@ -103,7 +106,7 @@ class Float(Numeric):
         """Create a QDoubleSpinBox."""
         super(Float, self).create_widget()
         self.widget = _qt.QDoubleSpinBox()
-        self.widget.valueChanged.connect(self.update_value)
+        self.widget.valueChanged.connect(self.update_value_from_widget)
 
 
 class Boolean(AttributeWidget):
@@ -113,10 +116,10 @@ class Boolean(AttributeWidget):
         super(Boolean, self).create_widget()
         self.widget = _qt.QCheckBox()
         self.widget.setTristate(False)
-        self.widget.stateChanged.connect(self.update_value)
+        self.widget.stateChanged.connect(self.update_value_from_widget)
 
-    def update_value(self):
-        super(Boolean, self).update_value()
+    def update_value_from_widget(self):
+        super(Boolean, self).update_value_from_widget()
         self.value = self.widget.isChecked()
 
     def update_widget_value(self, value):
@@ -130,10 +133,10 @@ class String(AttributeWidget):
         """Create a QLineEdit."""
         super(String, self).create_widget()
         self.widget = _qt.QLineEdit()
-        self.widget.editingFinished.connect(self.update_value)
+        self.widget.editingFinished.connect(self.update_value_from_widget)
 
-    def update_value(self):
-        super(String, self).update_value()
+    def update_value_from_widget(self):
+        super(String, self).update_value_from_widget()
         self.value = self.widget.text()
 
     def update_widget_value(self, value):
@@ -147,10 +150,10 @@ class Enum(AttributeWidget):
         """Create a QComboBox."""
         super(Enum, self).create_widget()
         self.widget = _qt.QComboBox()
-        self.widget.currentIndexChanged.connect(self.update_value)
+        self.widget.currentIndexChanged.connect(self.update_value_from_widget)
 
-    def update_value(self):
-        super(Enum, self).update_value()
+    def update_value_from_widget(self):
+        super(Enum, self).update_value_from_widget()
         self.value = self.widget.currentIndex()
 
     def update_widget_value(self, value):
