@@ -49,7 +49,6 @@ class AttributeWidget(_qt.QWidget):
     @value.setter
     def value(self, value):
         self._value = value
-        print value
         self.update_widget_value(value)
         if self.attribute.value != value:
             self.attribute.value = value
