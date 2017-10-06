@@ -14,18 +14,18 @@ graph:
 node:
     body:
         brush: [
-            53
-            53
-            53
+            55
+            59
+            65
         ]
     width: 200
     roundness: 6
     highlight:
-        padding: 3
+        padding: 2
         brush: [
-            255
-            240
-            100
+            105
+            154
+            195
         ]
     footer:
         brush: [
@@ -36,16 +36,16 @@ node:
         height: 15
     header:
         brush: [
-            33
-            33
-            33
+            40
+            42
+            46
         ]
         height: 30
     label:
         pen: [
-            83
-            83
-            83
+            192
+            197
+            206
         ]
         font:
             family: 'Helvetica [Cronyx]'
@@ -58,10 +58,40 @@ attribute:
 plug:
     size: 17
     brush: [
-        255
-        225
-        150
+        200
+        200
+        200
     ]
+    integer:
+        brush: [
+            181
+            189
+            104
+        ]
+    float:
+        brush: [
+            181
+            189
+            104
+        ]
+    boolean:
+        brush: [
+            204
+            102
+            102
+        ]
+    string:
+        brush: [
+            240
+            198
+            116
+        ]
+    enum:
+        brush: [
+            240
+            198
+            116
+        ]
     pen:
         width: 0
         brush: [
@@ -72,7 +102,7 @@ plug:
 connection:
     thickness: 5
     brush: [
-        73
-        73
-        73
+        75
+        79
+        85
     ]
