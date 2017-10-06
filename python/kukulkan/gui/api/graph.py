@@ -1,3 +1,5 @@
+import math
+
 import kukulkan.events
 from kukulkan.config import UI
 
@@ -25,6 +27,7 @@ class GraphView(_qt.QGraphicsView):
         self.zooming = False
         self.zooming_speed = .1
         self.zooming_speed_wheel = .1
+        self.scale_factor = 1
         self.setSceneRect(-2500, -2500, 5000, 5000)
         self.setHorizontalScrollBarPolicy(_qtcore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(_qtcore.Qt.ScrollBarAlwaysOff)
@@ -48,12 +51,10 @@ class GraphView(_qt.QGraphicsView):
         offset = (event.pos() - self.zooming_pos) * self.zooming_speed
         direction = offset.x() - offset.y()
         scale = 1
-        print direction, offset, offset.manhattanLength()
         if direction > 0:
             scale += offset.manhattanLength() * self.zooming_speed
         elif direction < 0:
             scale -= offset.manhattanLength() * self.zooming_speed
-        print scale
         self.scale(scale, scale)
         self.zooming_pos = event.pos()
 
@@ -63,17 +64,11 @@ class GraphView(_qt.QGraphicsView):
         elif event.button() == _qtcore.Qt.MiddleButton:
             self.panning = True
             self.panning_pos = event.pos()
-        elif event.button() == _qtcore.Qt.RightButton:
-            self.zooming = True
-            self.zooming_pos = event.pos()
         super(GraphView, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self.panning:
             self.pan_event(event)
-            return
-        if self.zooming:
-            self.zoom_event(event)
             return
         super(GraphView, self).mouseMoveEvent(event)
 
@@ -90,28 +85,36 @@ class GraphView(_qt.QGraphicsView):
         elif event.delta() < 0:
             scale -= self.zooming_speed_wheel
         self.scale(scale, scale)
+        self.scale_factor *= scale
 
     def drawBackground(self, painter, rect):
         painter.setBrush(_qt.QColor(*UI.graph.brush))
         painter.setPen(_qt.QColor(*UI.graph.grid.pen))
-        top = rect.top()
-        bottom = rect.bottom()
-        left = rect.left()
-        right = rect.right()
+        step = UI.graph.grid.step
+        top = rect.top() - (rect.top() % step)
+        bottom = rect.bottom()  # - (rect.bottom() % step)
+        left = rect.left() - (rect.left() % step)
+        right = rect.right()  # - (rect.right() % step)
 
         lines = []
 
-        currentXPos = left
-        while currentXPos <= right:
-            line = _qtcore.QLine(currentXPos, top, currentXPos, bottom)
+        x = left
+        while x <= right:
+            line = _qtcore.QLine(x, top, x, bottom)
             lines.append(line)
-            currentXPos += UI.graph.grid.step
+            x += step
 
-        currentYPos = top
-        while currentYPos <= bottom:
-            line = _qtcore.QLine(left, currentYPos, right, currentYPos)
+        y = top
+        while y <= bottom:
+            line = _qtcore.QLine(left, y, right, y)
             lines.append(line)
-            currentYPos += UI.graph.grid.step
+            y += step
+
+        # If the scene is very large, do not draw all the lines.
+        size_factor = 1 / max(self.scale_factor, .0000001)
+        skip_n = int(math.ceil((size_factor - 1) / 3.))
+        if size_factor > 2:
+            lines = lines[::skip_n]
 
         painter.drawRect(rect)
         painter.drawLines(lines)
