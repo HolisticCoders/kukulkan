@@ -121,4 +121,6 @@ class GraphView(_qt.QGraphicsView):
 
     def refresh(self):
         """Force the update of this view."""
-        self.scene().update(self.viewport().rect())
+        self.scene().update(
+            self.viewport().rect().adjusted(-100, -100, 200, 200)
+        )
