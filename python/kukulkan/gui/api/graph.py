@@ -92,9 +92,9 @@ class GraphView(_qt.QGraphicsView):
         painter.setPen(_qt.QColor(*UI.graph.grid.pen))
         step = UI.graph.grid.step
         top = rect.top() - (rect.top() % step)
-        bottom = rect.bottom()  # - (rect.bottom() % step)
+        bottom = rect.bottom()
         left = rect.left() - (rect.left() % step)
-        right = rect.right()  # - (rect.right() % step)
+        right = rect.right()
 
         lines = []
 
