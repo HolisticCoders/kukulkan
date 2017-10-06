@@ -71,7 +71,18 @@ class Plug(_qt.QGraphicsItem):
         )
 
     def paint(self, painter, option, widget):
-        painter.setBrush(_qt.QColor(*UI.plug.brush))
+        if self.attribute.type == 'integer':
+            painter.setBrush(_qt.QColor(*UI.plug.integer.brush))
+        elif self.attribute.type == 'float':
+            painter.setBrush(_qt.QColor(*UI.plug.float.brush))
+        elif self.attribute.type == 'boolean':
+            painter.setBrush(_qt.QColor(*UI.plug.boolean.brush))
+        elif self.attribute.type == 'string':
+            painter.setBrush(_qt.QColor(*UI.plug.string.brush))
+        elif self.attribute.type == 'enum':
+            painter.setBrush(_qt.QColor(*UI.plug.enum.brush))
+        else:
+            painter.setBrush(_qt.QColor(*UI.plug.brush))
         pen = _qt.QPen(
             _qt.QBrush(_qt.QColor(*UI.plug.pen.brush)),
             UI.plug.pen.width
