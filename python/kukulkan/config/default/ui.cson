@@ -9,19 +9,19 @@ graph:
         lines: [
             {
                 pen: [
-                    110
-                    110
-                    110
+                    53
+                    53
+                    53
                 ]
                 thickness: 0
             }
             {
                 pen: [
-                    110
-                    110
-                    110
+                    53
+                    53
+                    53
                 ]
-                thickness: 4
+                thickness: 2
             }
         ]
 node:
