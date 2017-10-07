@@ -1,5 +1,4 @@
-"""A simple publisher-observer implementation for event handling.
-"""
+"""A simple publisher-observer implementation for event handling."""
 
 import logging
 
