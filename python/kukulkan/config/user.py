@@ -1,4 +1,5 @@
 """Handling of user defined configurations."""
+import os
 
 
 _USER_ENV_VAR_PREFIX = 'KUKULKAN_CONFIG'
@@ -14,3 +15,12 @@ def get_env_var_key(name):
     :rtype: str
     """
     return '_'.join([_USER_ENV_VAR_PREFIX, name.upper()])
+
+
+def get_default_folder():
+    """Return the default configuration folder.
+
+    :rtype: str
+    """
+    return os.path.join(os.path.dirname(__file__), 'default')
+
