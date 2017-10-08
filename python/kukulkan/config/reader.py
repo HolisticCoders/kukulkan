@@ -1,9 +1,12 @@
-import cson
 import os
 import threading
 import time
 
 import kukulkan.events
+from kukulkan.config.collector import (
+    get_configuration_files,
+    get_configuration_file_data,
+)
 
 
 class FileWatcher(threading.Thread):
@@ -63,39 +66,31 @@ class FileWatcher(threading.Thread):
 class ConfigReader(object):
     """A configuration file reader.
 
-    :param str name: Name of the target configuration file.
-    :param str extension: Extension for this configuration file.
+    :param str name: Name of the configuration file.
+    :param str folder: Optional name of a configuration sub-folder.
+    :raise ValueError: When ``name`` does not refer to a valid
+                       configuration file name.
     """
 
-    def __init__(self, name, extension='.cson'):
+    def __init__(self, name, folder=None):
+        self._assert_configuration_exists(name, folder)
         self.name = name
-        self.extension = extension
-        self.path = self.resolve_path(name, extension)
-        self.watcher = FileWatcher(name, self.path)
+        self.folder = folder
+        self.paths = get_configuration_files(name)
         self.raw_data = {}
         self.data = Root()
-        if os.path.isfile(self.path):
-            self.read()
-        self.watcher.setDaemon(True)
-        self.watcher.start()
-        kukulkan.events.subscribe(self.read, 'config.ui.changed')
-
-    @staticmethod
-    def resolve_path(name, extension):
-        """Resolve full path for target configuration file name.
-
-        :param str name: Name of the target configuration file.
-        :param str extension: Extension for this configuration file.
-        :rtype: str
-        """
-        if not name.endswith(extension):
-            name += extension
-        return os.path.join(os.path.dirname(__file__), 'default', name)
+        self.read()
+        self.watchers = []
+        self._setup_watchers()
+        event_name = 'config.{}.changed'.format(self.name)
+        kukulkan.events.subscribe(self.read, event_name)
 
     def read(self):
         """Read the configuration file and update this reader data."""
-        with open(self.path, 'r') as fh:
-            self.raw_data = cson.load(fh)
+        self.raw_data = get_configuration_file_data(
+            self.name,
+            self.folder,
+        )
         self._visit_raw_data(self.raw_data)
 
     def __getattr__(self, name):
@@ -103,6 +98,30 @@ class ConfigReader(object):
             return self.data.children[name]
         err = 'ConfigReader object has no attribute {}.'.format(name)
         raise AttributeError(err)
+
+    def _assert_configuration_exists(self, name, folder):
+        """Ensure ``name`` corresponds to a setting file.
+
+        :param str name: Name of the configuration file.
+        :param str folder: Optional name of a configuration
+                           sub-folder.
+        :raise ValueError: When ``name`` does not refer to a
+                           valid configuration file name.
+        """
+        if not get_configuration_files(name, folder):
+            err = (
+                '``name`` argument should be '
+                'a valid configuration name !'
+            )
+            raise ValueError(err)
+
+    def _setup_watchers(self):
+        """Create `FileWatcher` to keep track of changes."""
+        for path in self.paths:
+            watcher = FileWatcher(self.name, path)
+            watcher.setDaemon(True)
+            watcher.start()
+            self.watchers.append(watcher)
 
     def _visit_raw_data(self, root, parent=None):
         """Recursively visit a tree."""
@@ -131,7 +150,9 @@ class Item(object):
         try:
             return getattr(self.value, name)
         except AttributeError:
-            raise AttributeError('Item object has no attribute {}.'.format(name))
+            raise AttributeError(
+                'Item object has no attribute {}.'.format(name)
+            )
 
     def __repr__(self):
         return repr(self.value)
