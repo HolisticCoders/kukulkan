@@ -134,3 +134,46 @@ def get_configuration_folders(name):
 
     return folders or None
 
+
+def get_configuration_file_data(name, folder=None):
+    """Return the content of a configuration file data.
+
+    You can specify a ``folder`` name to look for this configuration
+    file in a configuration folder instead of the root folder.
+
+    If ``name`` does not correspond to any setting, return `None`.
+
+    If ``folder`` does not correspond to any setting, also return `None`.
+
+    :param str name: Name of the configuration file.
+    :param str folder: Optional name of a configuration sub-folder.
+    :rtype: dict or None
+    """
+    if folder is None:
+        folders = get_root_folders()
+    else:
+        folders = get_configuration_folders(folder)
+
+    if not folders:
+        return None
+
+    if not name.endswith(_CONFIG_FILE_EXT):
+        name += _CONFIG_FILE_EXT
+
+    configs = []
+    for folder in folders:
+        path = os.path.join(folder, name)
+        if not os.path.isfile(config):
+            continue
+        configs.append(config)
+
+    if not configs:
+        return None
+
+    data = {}
+    for path in configs:
+        with open(path, 'r') as fh:
+            data.update(cson.load(fh))
+
+    return data
+
