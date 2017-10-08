@@ -1,4 +1,5 @@
 """Handling of user defined configurations."""
+import cson
 import os
 
 
@@ -93,19 +94,19 @@ def get_configuration_path(name, root='default', config_type=None):
     # Folder selection
     # Check if this is a folder.
     if config_type is None or config_type == 'folder':
-        if os.path.isdir(user_path):
-            return user_path
+        if os.path.isdir(path):
+            return path
 
     # File selection
     if config_type is None or config_type == 'file':
 
         # If not, ensure it has the configuration file extension first,
         # then check if it exists.
-        if not user_path.endswith(_CONFIG_FILE_EXT):
-        user_path += _CONFIG_FILE_EXT
+        if not path.endswith(_CONFIG_FILE_EXT):
+            path += _CONFIG_FILE_EXT
 
-        if os.path.isfile(user_path):
-            return user_path
+        if os.path.isfile(path):
+            return path
 
     # No user configuration for this setting.
     return None
@@ -166,9 +167,9 @@ def get_configuration_files(name, folder=None):
     configs = []
     for folder in folders:
         path = os.path.join(folder, name)
-        if not os.path.isfile(config):
+        if not os.path.isfile(path):
             continue
-        configs.append(config)
+        configs.append(path)
 
     if not configs:
         return None
