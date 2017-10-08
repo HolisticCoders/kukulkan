@@ -106,3 +106,14 @@ connection:
         79
         85
     ]
+widgets:
+    color: [
+        192
+        197
+        206
+    ]
+    background: [
+        40
+        42
+        46
+    ]

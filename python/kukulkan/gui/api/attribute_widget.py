@@ -2,6 +2,7 @@ from functools import partial
 
 import kukulkan.gui.qt.QtGui as _qt
 import kukulkan.gui.qt.QtCore as _qtcore
+import kukulkan.gui.qt.styled_widgets as _styled_widgets
 
 
 class AttributeWidget(_qt.QWidget):
@@ -95,7 +96,7 @@ class Integer(Numeric):
     def create_widget(self):
         """Create a QSpinBox."""
         super(Integer, self).create_widget()
-        self.widget = _qt.QSpinBox()
+        self.widget = _styled_widgets.SpinBox()
         self.widget.valueChanged.connect(self.update_value_from_widget)
 
 
@@ -104,7 +105,7 @@ class Float(Numeric):
     def create_widget(self):
         """Create a QDoubleSpinBox."""
         super(Float, self).create_widget()
-        self.widget = _qt.QDoubleSpinBox()
+        self.widget = _styled_widgets.DoubleSpinBox()
         self.widget.valueChanged.connect(self.update_value_from_widget)
 
 
@@ -131,7 +132,7 @@ class String(AttributeWidget):
     def create_widget(self):
         """Create a QLineEdit."""
         super(String, self).create_widget()
-        self.widget = _qt.QLineEdit()
+        self.widget = _styled_widgets.LineEdit()
         self.widget.editingFinished.connect(self.update_value_from_widget)
 
     def update_value_from_widget(self):
@@ -148,7 +149,7 @@ class Enum(AttributeWidget):
     def create_widget(self):
         """Create a QComboBox."""
         super(Enum, self).create_widget()
-        self.widget = _qt.QComboBox()
+        self.widget = _styled_widgets.ComboBox()
         self.widget.currentIndexChanged.connect(self.update_value_from_widget)
 
     def update_value_from_widget(self):
