@@ -120,8 +120,10 @@ class GraphView(_qt.QGraphicsView):
         thick = []
         thin = []
 
+        step = UI.graph.grid.step
+        mod = 9 - (math.ceil(rect.top() / step) % 10)
         for i, line in enumerate(h_lines):
-            if i % 10 == 0:
+            if i % 10 == mod:
                 thick.append(line)
             else:
                 thin.append(line)
@@ -129,8 +131,9 @@ class GraphView(_qt.QGraphicsView):
         # Two separate enumerations as the two lists will not always
         # be of the same size.
         # Will have to find something better !
+        mod = 9 - (math.ceil(rect.left() / step) % 10)
         for i, line in enumerate(v_lines):
-            if i % 10 == 0:
+            if i % 10 == mod:
                 thick.append(line)
             else:
                 thin.append(line)
