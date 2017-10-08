@@ -110,3 +110,27 @@ def get_configuration_path(name, root='default', config_type=None):
     # No user configuration for this setting.
     return None
 
+
+def get_configuration_folders(name):
+    """Return all folders for the specified setting.
+
+    ``name`` argument should refer to an existing setting folder,
+    for example, "themes".
+
+    By default, the default folder is returned.
+    If a user configuration folder also exists, it is appended to the
+    list.
+
+    If ``name`` does not correspond to any setting, return `None`.
+
+    :param str name: Name of the configuration folder.
+    :rtype: list(str) or None
+    """
+    folders = []
+    for root in _ROOT_TYPES:
+        folder = get_configuration_path(name, root, 'folder')
+        if not folder:
+            continue
+
+    return folders or None
+
