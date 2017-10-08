@@ -13,6 +13,7 @@ class BaseConnection(_qt.QGraphicsPathItem):
 
     def __init__(self, *args, **kwargs):
         super(BaseConnection, self).__init__(*args, **kwargs)
+        self.setZValue(-1)
         self.setFlag(_qt.QGraphicsItem.ItemStacksBehindParent)
         self.source_pos = self.destination_pos = _qtcore.QPointF(0, 0)
 
@@ -109,7 +110,7 @@ class Connection(BaseConnection):
         self._about_to_disconnect = False
         self._disconnect_from = None
         self._disconnect_attach = None
-        self.setParentItem(source)
+        source.scene().addItem(self)
         source.on_connection(destination)
         destination.on_connection(source)
 
@@ -124,10 +125,13 @@ class Connection(BaseConnection):
         will be used instead.
         """
         if self.source:
-            self.source_pos = self.source.boundingRect().center()
+            self.source_pos = self.source.mapToItem(
+                self,
+                self.source.boundingRect().center(),
+            )
         if self.destination:
             self.destination_pos = self.destination.mapToItem(
-                self.source,
+                self,
                 self.destination.boundingRect().center(),
             )
         super(Connection, self).compute_path()

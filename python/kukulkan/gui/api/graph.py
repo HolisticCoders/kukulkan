@@ -89,35 +89,86 @@ class GraphView(_qt.QGraphicsView):
 
     def drawBackground(self, painter, rect):
         painter.setBrush(_qt.QColor(*UI.graph.brush))
-        painter.setPen(_qt.QColor(*UI.graph.grid.pen))
+        painter.drawRect(rect)
+
+        for i, lines in enumerate(self.get_grid_lines(rect)):
+            color = _qt.QColor(*UI.graph.grid.lines[i]['pen'])
+            thickness = UI.graph.grid.lines[i]['thickness']
+            painter.setPen(_qt.QPen(color, thickness))
+            painter.drawLines(lines)
+
+    def get_grid_lines(self, rect):
+        """Return grid lines to draw.
+
+        Returned value contains multiple lists, as there will
+        be lines of different weight.
+        Thiner lines are returned first.
+
+        :param rect: Area to cover with lines.
+        :type rect: PySide.QtCore.QRectF
+        :rtype: list(list(PySide.QtCore.QLine))
+        """
+        h_lines, v_lines = self._get_base_lines(rect)
+
+        # If the scene is very large, do not draw all the lines.
+        size_factor = 1 / max(self.scale_factor, .0000001)
+        skip_n = int(math.ceil((size_factor - 1) / 3.))
+        if size_factor > 2:
+            v_lines = v_lines[::skip_n]
+            h_lines = h_lines[::skip_n]
+
+        thick = []
+        thin = []
+
+        step = UI.graph.grid.step
+        mod = 9 - (math.ceil(rect.top() / step) % 10)
+        for i, line in enumerate(h_lines):
+            if i % 10 == mod:
+                thick.append(line)
+            else:
+                thin.append(line)
+
+        # Two separate enumerations as the two lists will not always
+        # be of the same size.
+        # Will have to find something better !
+        mod = 9 - (math.ceil(rect.left() / step) % 10)
+        for i, line in enumerate(v_lines):
+            if i % 10 == mod:
+                thick.append(line)
+            else:
+                thin.append(line)
+
+        return thin, thick
+
+    def _get_base_lines(self, rect):
+        """Return horizontal and vertical lines of the grid.
+
+        :param rect: Area to cover with lines.
+        :type rect: PySide.QtCore.QRectF
+        :rtype: tuple(list(PySide.QtCore.QLine), list(PySide.QtCore.QLine))
+        """
         step = UI.graph.grid.step
         top = rect.top() - (rect.top() % step)
         bottom = rect.bottom()
         left = rect.left() - (rect.left() % step)
         right = rect.right()
 
-        lines = []
+        h_lines = []
+        v_lines = []
 
         x = left
         while x <= right:
             line = _qtcore.QLine(x, top, x, bottom)
-            lines.append(line)
+            v_lines.append(line)
             x += step
 
         y = top
         while y <= bottom:
             line = _qtcore.QLine(left, y, right, y)
-            lines.append(line)
+            h_lines.append(line)
             y += step
 
-        # If the scene is very large, do not draw all the lines.
-        size_factor = 1 / max(self.scale_factor, .0000001)
-        skip_n = int(math.ceil((size_factor - 1) / 3.))
-        if size_factor > 2:
-            lines = lines[::skip_n]
-
-        painter.drawRect(rect)
-        painter.drawLines(lines)
+        return h_lines, v_lines
 
     def refresh(self):
         """Force the update of this view."""

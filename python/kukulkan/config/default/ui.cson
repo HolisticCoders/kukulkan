@@ -6,10 +6,23 @@ graph:
     ]
     grid:
         step: 50
-        pen: [
-            40
-            42
-            46
+        lines: [
+            {
+                pen: [
+                    53
+                    53
+                    53
+                ]
+                thickness: 0
+            }
+            {
+                pen: [
+                    53
+                    53
+                    53
+                ]
+                thickness: 2
+            }
         ]
 node:
     body:
