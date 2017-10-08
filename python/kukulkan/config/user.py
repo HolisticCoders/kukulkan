@@ -177,3 +177,30 @@ def get_configuration_file_data(name, folder=None):
 
     return data
 
+
+def get_configuration_folder_files(name):
+    """Return all choices available in a configuration folder.
+
+    This include default and user configurations.
+
+    If ``name`` does not correspond to any folder, return `None`.
+
+    :param str name: Name of the configuration folder.
+    :rtype: list(str) or None
+    """
+    folders = get_configuration_folders(name)
+
+    if not folders:
+        return None
+
+    files = []
+    for folder in folders:
+        content = os.listdir(folder)
+        for file_name in content:
+            if not file_name.endswith(_CONFIG_FILE_EXT):
+                continue
+            if file_name in files:
+                continue
+            files.append(file_name)
+
+    return files
