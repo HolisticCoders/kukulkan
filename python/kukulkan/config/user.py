@@ -2,6 +2,7 @@
 import os
 
 
+_CONFIG_FILE_EXT = '.cson'
 _USER_ENV_VAR_PREFIX = 'KUKULKAN_CONFIG'
 _ROOT_TYPES = [
     'default',
@@ -58,3 +59,54 @@ def get_root_folders():
         if callable(getter):
             getters.append(getter)
     return [g() for g in getters]
+
+
+def get_configuration_path(name, root='default', config_type=None):
+    """Return a configuration file or folder path.
+
+    The ``name`` argument is the name of the file or folder to get.
+
+    By default, this function will return default configuration
+    files and folder, if you want user specific configuration
+    set the ``root`` argument to "user".
+
+    If you want to ensure `get_configuration_path` can only return
+    a file, you can set the ``config_type`` argument to "file".
+    For folders, user the "folder" value.
+
+    If no configuration file or folder is found, return `None`.
+
+    :param str name: Name of the configuration file or folder.
+    :param str root: Either "default", "user" or any root type available.
+    :param str config_type: Force "file" or "folder" look-up.
+    :rtype: str or None
+    """
+    if root == 'user':
+        key = get_env_var_key(name)
+        if key in os.environ:
+            path = os.environ[key]
+        else:
+            path = os.path.join(get_user_folder(), name)
+    else:
+        path = os.path.join(get_default_folder(), name)
+
+    # Folder selection
+    # Check if this is a folder.
+    if config_type is None or config_type == 'folder':
+        if os.path.isdir(user_path):
+            return user_path
+
+    # File selection
+    if config_type is None or config_type == 'file':
+
+        # If not, ensure it has the configuration file extension first,
+        # then check if it exists.
+        if not user_path.endswith(_CONFIG_FILE_EXT):
+        user_path += _CONFIG_FILE_EXT
+
+        if os.path.isfile(user_path):
+            return user_path
+
+    # No user configuration for this setting.
+    return None
+
