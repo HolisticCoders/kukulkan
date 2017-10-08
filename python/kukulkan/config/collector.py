@@ -178,7 +178,7 @@ def get_configuration_file_data(name, folder=None):
     return data
 
 
-def get_configuration_folder_files(name):
+def get_configuration_folder_choices(name):
     """Return all choices available in a configuration folder.
 
     This include default and user configurations.
