@@ -135,8 +135,11 @@ def get_configuration_folders(name):
     return folders or None
 
 
-def get_configuration_file_data(name, folder=None):
-    """Return the content of a configuration file data.
+def get_configuration_files(name, folder=None):
+    """Return all configuration files for this setting.
+
+    For example, ``get_configuration_files('ui')`` will return the default
+    ``ui.cson`` file and the user one if any.
 
     You can specify a ``folder`` name to look for this configuration
     file in a configuration folder instead of the root folder.
@@ -147,7 +150,7 @@ def get_configuration_file_data(name, folder=None):
 
     :param str name: Name of the configuration file.
     :param str folder: Optional name of a configuration sub-folder.
-    :rtype: dict or None
+    :rtype: list(str) or None
     """
     if folder is None:
         folders = get_root_folders()
@@ -166,6 +169,28 @@ def get_configuration_file_data(name, folder=None):
         if not os.path.isfile(config):
             continue
         configs.append(config)
+
+    if not configs:
+        return None
+
+    return configs
+
+
+def get_configuration_file_data(name, folder=None):
+    """Return the content of a configuration file data.
+
+    You can specify a ``folder`` name to look for this configuration
+    file in a configuration folder instead of the root folder.
+
+    If ``name`` does not correspond to any setting, return `None`.
+
+    If ``folder`` does not correspond to any setting, also return `None`.
+
+    :param str name: Name of the configuration file.
+    :param str folder: Optional name of a configuration sub-folder.
+    :rtype: dict or None
+    """
+    configs = get_configuration_files(name, folder)
 
     if not configs:
         return None
