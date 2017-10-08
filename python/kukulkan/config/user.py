@@ -24,3 +24,17 @@ def get_default_folder():
     """
     return os.path.join(os.path.dirname(__file__), 'default')
 
+
+def get_user_folder():
+    """Return the user configuration folder.
+
+    By default, return "~/kukulkan/config"
+
+    Users can edit this path by setting a "KUKULKAN_CONFIG" environment
+    variable containing the path to their configuration folder.
+
+    :rtype: str
+    """
+    home = os.environ.get('HOME', os.path.expanduser('~'))
+    return os.path.join(home, 'kukulkan', 'config')
+
