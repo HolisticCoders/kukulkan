@@ -1,7 +1,7 @@
 graph:
     brush: [29, 31, 33]
     grid:
-        step: 50
+        step: 20
         lines: [
             {
                 pen: [53, 53, 53]
