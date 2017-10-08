@@ -5,7 +5,7 @@ graph:
         33
     ]
     grid:
-        step: 50
+        step: 20
         lines: [
             {
                 pen: [
