@@ -3,6 +3,10 @@ import os
 
 
 _USER_ENV_VAR_PREFIX = 'KUKULKAN_CONFIG'
+_ROOT_TYPES = [
+    'default',
+    'user',
+]
 
 
 def get_env_var_key(name):
@@ -38,3 +42,19 @@ def get_user_folder():
     home = os.environ.get('HOME', os.path.expanduser('~'))
     return os.path.join(home, 'kukulkan', 'config')
 
+
+def get_root_folders():
+    """Return all configuration folders.
+
+    This include the default one and all user ones.
+
+    :rtype: list(str)
+    """
+    content = globals()
+    getters = []
+    for root in _ROOT_TYPES:
+        getter_name = 'get_{}_folder'.format(root)
+        getter = content.get(getter_name, None)
+        if callable(getter):
+            getters.append(getter)
+    return [g() for g in getters]
