@@ -18,17 +18,13 @@ def setup():
             key = name.split('.')[0]
             reader = ConfigReader(key)
             globals()[key.upper()] = reader
-            print 'New ConfigReader:', key
         elif os.path.isdir(path):
             FolderWatcher(name, path)
-            print 'New FolderWatcher:', name
-
             choices = get_configuration_folder_choices(name, candidate=True)
             for choice in choices:
                 key = choice.split('.')[0]
                 reader = ConfigReader(key, folder=name)
                 globals()[key.upper()] = reader
-                print 'New ConfigReader:', key, name
 
 
 setup()
