@@ -16,7 +16,6 @@ class ConfigReader(object):
     """
 
     def __init__(self, name, folder=None):
-        self._assert_configuration_exists(name, folder)
         self.name = name
         self.folder = folder
         self.paths = get_configuration_files(name, candidate=True)
@@ -42,22 +41,6 @@ class ConfigReader(object):
             return self.data.children[name]
         err = 'ConfigReader object has no attribute {}.'.format(name)
         raise AttributeError(err)
-
-    def _assert_configuration_exists(self, name, folder):
-        """Ensure ``name`` corresponds to a setting file.
-
-        :param str name: Name of the configuration file.
-        :param str folder: Optional name of a configuration
-                           sub-folder.
-        :raise ValueError: When ``name`` does not refer to a
-                           valid configuration file name.
-        """
-        if not get_configuration_files(name, folder):
-            err = (
-                '``name`` argument should be '
-                'a valid configuration name !'
-            )
-            raise ValueError(err)
 
     def _setup_watchers(self):
         """Create `FileWatcher` to keep track of changes."""
