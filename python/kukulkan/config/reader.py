@@ -19,7 +19,7 @@ class ConfigReader(object):
         self._assert_configuration_exists(name, folder)
         self.name = name
         self.folder = folder
-        self.paths = get_configuration_files(name)
+        self.paths = get_configuration_files(name, candidate=True)
         self.raw_data = {}
         self.data = Root()
         self.read()
@@ -33,6 +33,7 @@ class ConfigReader(object):
         self.raw_data = get_configuration_file_data(
             self.name,
             self.folder,
+            candidate=True,
         )
         self._visit_raw_data(self.raw_data)
 
