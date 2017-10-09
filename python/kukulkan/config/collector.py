@@ -154,8 +154,12 @@ def get_configuration_folders(name, candidate=False):
         )
         if not folder:
             continue
+        folders.append(folder)
 
-    return folders or None
+    if not folders and not candidate:
+        return None
+
+    return folders
 
 
 def get_configuration_files(name, folder=None, candidate=False):
