@@ -62,7 +62,12 @@ def get_root_folders():
     return [g() for g in getters]
 
 
-def get_configuration_path(name, root='default', config_type=None):
+def get_configuration_path(
+    name,
+    root='default',
+    config_type=None,
+    candidate=False,
+):
     """Return a configuration file or folder path.
 
     The ``name`` argument is the name of the file or folder to get.
@@ -76,6 +81,9 @@ def get_configuration_path(name, root='default', config_type=None):
     For folders, user the "folder" value.
 
     If no configuration file or folder is found, return `None`.
+
+    If ``candidate`` argument is set to `True`, then no check is done
+    to ensure the folder or file exists.
 
     :param str name: Name of the configuration file or folder.
     :param str root: Either "default", "user" or any root type available.
@@ -93,7 +101,10 @@ def get_configuration_path(name, root='default', config_type=None):
 
     # Folder selection
     # Check if this is a folder.
-    if config_type is None or config_type == 'folder':
+    if config_type == 'folder':
+        if candidate:
+            return path
+    elif config_type is None:
         if os.path.isdir(path):
             return path
 
@@ -105,6 +116,9 @@ def get_configuration_path(name, root='default', config_type=None):
         if not path.endswith(_CONFIG_FILE_EXT):
             path += _CONFIG_FILE_EXT
 
+        if candidate:
+            return path
+
         if os.path.isfile(path):
             return path
 
@@ -112,7 +126,7 @@ def get_configuration_path(name, root='default', config_type=None):
     return None
 
 
-def get_configuration_folders(name):
+def get_configuration_folders(name, candidate=False):
     """Return all folders for the specified setting.
 
     ``name`` argument should refer to an existing setting folder,
@@ -124,19 +138,27 @@ def get_configuration_folders(name):
 
     If ``name`` does not correspond to any setting, return `None`.
 
+    If ``candidate`` argument is set to `True`, then no check is done
+    to ensure the folders exists.
+
     :param str name: Name of the configuration folder.
     :rtype: list(str) or None
     """
     folders = []
     for root in _ROOT_TYPES:
-        folder = get_configuration_path(name, root, 'folder')
+        folder = get_configuration_path(
+            name,
+            root,
+            'folder',
+            candidate,
+        )
         if not folder:
             continue
 
     return folders or None
 
 
-def get_configuration_files(name, folder=None):
+def get_configuration_files(name, folder=None, candidate=False):
     """Return all configuration files for this setting.
 
     For example, ``get_configuration_files('ui')`` will return the default
@@ -149,6 +171,9 @@ def get_configuration_files(name, folder=None):
 
     If ``folder`` does not correspond to any setting, also return `None`.
 
+    If ``candidate`` argument is set to `True`, then no check is done
+    to ensure the folders exists.
+
     :param str name: Name of the configuration file.
     :param str folder: Optional name of a configuration sub-folder.
     :rtype: list(str) or None
@@ -156,10 +181,12 @@ def get_configuration_files(name, folder=None):
     if folder is None:
         folders = get_root_folders()
     else:
-        folders = get_configuration_folders(folder)
+        folders = get_configuration_folders(folder, candidate)
 
-    if not folders:
+    if not folders and not candidate:
         return None
+    elif not folders:
+        folders = []
 
     if not name.endswith(_CONFIG_FILE_EXT):
         name += _CONFIG_FILE_EXT
@@ -167,17 +194,17 @@ def get_configuration_files(name, folder=None):
     configs = []
     for folder in folders:
         path = os.path.join(folder, name)
-        if not os.path.isfile(path):
+        if not os.path.isfile(path) and not candidate:
             continue
         configs.append(path)
 
-    if not configs:
+    if not configs and not candidate:
         return None
 
     return configs
 
 
-def get_configuration_file_data(name, folder=None):
+def get_configuration_file_data(name, folder=None, candidate=False):
     """Return the content of a configuration file data.
 
     You can specify a ``folder`` name to look for this configuration
@@ -187,40 +214,50 @@ def get_configuration_file_data(name, folder=None):
 
     If ``folder`` does not correspond to any setting, also return `None`.
 
+    If ``candidate`` argument is set to `True`, then no check is done
+    to ensure the folders exists.
+
     :param str name: Name of the configuration file.
     :param str folder: Optional name of a configuration sub-folder.
     :rtype: dict or None
     """
-    configs = get_configuration_files(name, folder)
+    configs = get_configuration_files(name, folder, candidate)
 
-    if not configs:
+    if not configs and not candidate:
         return None
 
     data = {}
     for path in configs:
+        if not os.path.isfile(path):
+            continue
         with open(path, 'r') as fh:
             data.update(cson.load(fh))
 
     return data
 
 
-def get_configuration_folder_choices(name):
+def get_configuration_folder_choices(name, candidate=False):
     """Return all choices available in a configuration folder.
 
     This include default and user configurations.
 
     If ``name`` does not correspond to any folder, return `None`.
 
+    If ``candidate`` argument is set to `True`, then no check is done
+    to ensure the folders exists.
+
     :param str name: Name of the configuration folder.
     :rtype: list(str) or None
     """
-    folders = get_configuration_folders(name)
+    folders = get_configuration_folders(name, candidate)
 
-    if not folders:
+    if not folders and not candidate:
         return None
 
     files = []
     for folder in folders:
+        if not os.path.isdir(folder):
+            continue
         content = os.listdir(folder)
         for file_name in content:
             if not file_name.endswith(_CONFIG_FILE_EXT):
