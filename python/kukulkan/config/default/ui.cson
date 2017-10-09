@@ -1,65 +1,33 @@
 graph:
-    brush: [
-        29
-        31
-        33
-    ]
+    brush: [29, 31, 33]
     grid:
         step: 20
         lines: [
             {
-                pen: [
-                    53
-                    53
-                    53
-                ]
+                pen: [53, 53, 53]
                 thickness: 0
             }
             {
-                pen: [
-                    53
-                    53
-                    53
-                ]
+                pen: [53, 53, 53]
                 thickness: 2
             }
         ]
 node:
     body:
-        brush: [
-            55
-            59
-            65
-        ]
+        brush: [55, 59, 65]
     width: 200
     roundness: 6
     highlight:
         padding: 2
-        brush: [
-            105
-            154
-            195
-        ]
+        brush: [105, 154, 195]
     footer:
-        brush: [
-            50
-            50
-            50
-        ]
+        brush: [50, 50, 50]
         height: 15
     header:
-        brush: [
-            40
-            42
-            46
-        ]
+        brush: [40, 42, 46]
         height: 30
     label:
-        pen: [
-            192
-            197
-            206
-        ]
+        pen: [192, 197, 206]
         font:
             family: 'Helvetica [Cronyx]'
             size: 11
@@ -70,50 +38,23 @@ attribute:
     spacing: 20
 plug:
     size: 17
-    brush: [
-        200
-        200
-        200
-    ]
+    brush: [200, 200, 200]
     integer:
-        brush: [
-            181
-            189
-            104
-        ]
+        brush: [181, 189, 104]
     float:
-        brush: [
-            181
-            189
-            104
-        ]
+        brush: [181, 189, 104]
     boolean:
-        brush: [
-            204
-            102
-            102
-        ]
+        brush: [204, 102, 102]
     string:
-        brush: [
-            240
-            198
-            116
-        ]
+        brush: [240, 198, 116]
     enum:
-        brush: [
-            240
-            198
-            116
-        ]
+        brush: [240, 198, 116]
     pen:
         width: 0
-        brush: [
-            150
-            150
-            150
-        ]
+        brush: [150, 150, 150]
 connection:
     thickness: 5
+<<<<<<< HEAD
     brush: [
         75
         79
@@ -130,3 +71,6 @@ widgets:
         42
         46
     ]
+=======
+    brush: [75, 79, 85]
+>>>>>>> 4c787cf90d8d86c217f789d3e8ea0a5df252d9d3
