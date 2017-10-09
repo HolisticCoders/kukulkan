@@ -1,6 +1,7 @@
 """Handling of user defined configurations."""
 import cson
 import os
+import sys
 
 
 _CONFIG_FILE_EXT = '.cson'
@@ -41,8 +42,12 @@ def get_user_folder():
 
     :rtype: str
     """
-    home = os.environ.get('HOME', os.path.expanduser('~'))
-    return os.path.join(home, 'kukulkan', 'config')
+    folders = []
+    folders.append(os.environ.get('HOME', os.path.expanduser('~')))
+    if not sys.platform == 'win32':
+        folders.append('.config')
+    folders.append('kukulkan')
+    return os.path.join(*folders)
 
 
 def get_root_folders():
