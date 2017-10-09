@@ -54,4 +54,23 @@ plug:
         brush: [150, 150, 150]
 connection:
     thickness: 5
+<<<<<<< HEAD
+    brush: [
+        75
+        79
+        85
+    ]
+widgets:
+    color: [
+        192
+        197
+        206
+    ]
+    background: [
+        40
+        42
+        46
+    ]
+=======
     brush: [75, 79, 85]
+>>>>>>> 4c787cf90d8d86c217f789d3e8ea0a5df252d9d3
